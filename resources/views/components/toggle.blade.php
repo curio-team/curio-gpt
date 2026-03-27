@@ -1,7 +1,7 @@
 @props([
 'model' => 'enabled',
-'onLabel' => __('Enabled'),
-'offLabel' => __('Disabled'),
+'onLabel' => __('app.common.enabled'),
+'offLabel' => __('app.common.disabled'),
 ])
 
 <label {{

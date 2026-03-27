@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', __('Agent Observations') . ' - ' . config('app.name', 'CurioGPT'))
+@section('title', __('app.teacher.observations.title') . ' - ' . config('app.name', 'CurioGPT'))
 
 @section('content')
 <div class="mx-auto max-w-3xl w-full px-4 py-8">
 
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-xl font-semibold text-black dark:text-white">{{ __('Agent Observations') }}</h1>
+        <h1 class="text-xl font-semibold text-black dark:text-white">{{ __('app.teacher.observations.title') }}</h1>
         <div class="flex items-center gap-4">
             <a href="{{ route('teacher.chats.index') }}"
                class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
-                {{ __('View Chats') }}
+                {{ __('app.teacher.observations.view_chats') }}
             </a>
         </div>
     </div>
@@ -18,7 +18,7 @@
     @if ($observations->isEmpty())
     <div
          class="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 px-6 py-12 text-center">
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No observations yet.') }}</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('app.teacher.observations.no_observations_yet') }}</p>
     </div>
     @else
     <div
@@ -29,7 +29,7 @@
             <div class="flex items-start justify-between gap-4">
                 <div class="min-w-0 flex-1">
                     <p class="text-sm font-medium text-black dark:text-white truncate">
-                        {{ $o->student_name ?? __('Unknown student') }}
+                        {{ $o->student_name ?? __('app.common.unknown_student') }}
                     </p>
                     <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
                         {{ $o->content }}

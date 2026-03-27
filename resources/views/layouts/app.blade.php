@@ -38,12 +38,12 @@
                 @if (auth()->user()->isTeacher())
                 <a href="{{ route('teacher.agents.index') }}"
                    class="text-sm text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-                    {{ __('Manage Agents') }}
+                    {{ __('app.nav.manage_agents') }}
                 </a>
                 <span class="text-gray-300 dark:text-gray-700 select-none">·</span>
                 <a href="{{ route('teacher.chats.index') }}"
                    class="text-sm text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-                    {{ __('Monitoring') }}
+                    {{ __('app.nav.monitoring') }}
                 </a>
                 <span class="text-gray-300 dark:text-gray-700 select-none">·</span>
                 @endif
@@ -51,7 +51,7 @@
                 @else
                 <a href="{{ route('login') }}"
                    class="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-90">
-                    {{ __('Log in') }}
+                    {{ __('app.nav.log_in') }}
                 </a>
                 @endauth
             </nav>

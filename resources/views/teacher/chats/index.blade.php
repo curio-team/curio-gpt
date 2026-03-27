@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', __('Student Chats') . ' - ' . config('app.name', 'CurioGPT'))
+@section('title', __('app.teacher.chats.title') . ' - ' . config('app.name', 'CurioGPT'))
 
 @section('content')
 <div class="mx-auto max-w-3xl w-full px-4 py-8">
 
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-xl font-semibold text-black dark:text-white">{{ __('Student Chats') }}</h1>
+        <h1 class="text-xl font-semibold text-black dark:text-white">{{ __('app.teacher.chats.title') }}</h1>
         <div class="flex items-center gap-4">
             <a href="{{ route('teacher.usage.index') }}"
                class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
-                {{ __('View Usage') }}
+                {{ __('app.teacher.chats.view_usage') }}
             </a>
         </div>
     </div>
@@ -18,7 +18,7 @@
     @if ($conversations->isEmpty())
     <div
          class="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 px-6 py-12 text-center">
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No chats yet.') }}</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('app.teacher.chats.no_chats_yet') }}</p>
     </div>
     @else
     <div
@@ -28,7 +28,7 @@
            class="flex items-center justify-between gap-4 px-5 py-4 hover:bg-black/[.02] dark:hover:bg-white/[.02] transition-colors">
             <div class="min-w-0 flex-1">
                 <p class="text-sm font-medium text-black dark:text-white truncate">
-                    {{ $conversation->student_name ?? __('Unknown student') }}
+                    {{ $conversation->student_name ?? __('app.common.unknown_student') }}
                 </p>
                 <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400 truncate">
                     {{ $conversation->title }}
@@ -41,7 +41,7 @@
                     {{ $conversation->agent_name }}
                 </span>
                 @else
-                <span class="text-xs text-gray-400 dark:text-gray-600">{{ __('No agent') }}</span>
+                <span class="text-xs text-gray-400 dark:text-gray-600">{{ __('app.common.no_agent') }}</span>
                 @endif
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-600">
                     {{ \Carbon\Carbon::parse($conversation->updated_at)->diffForHumans() }}

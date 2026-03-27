@@ -14,32 +14,32 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                     @click="tab = 'general'"
                     :class="tab === 'general' ? 'bg-black/10 dark:bg-white/10 text-black dark:text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'"
                     class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors">
-                {{ __('General') }}
+                {{ __('app.teacher.agents.form.tabs.general') }}
             </button>
             <button type="button"
                     @click="tab = 'access'"
                     :class="tab === 'access' ? 'bg-black/10 dark:bg-white/10 text-black dark:text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'"
                     class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors">
-                {{ __('Access') }}
+                {{ __('app.teacher.agents.form.tabs.access') }}
             </button>
             <button type="button"
                     @click="tab = 'advanced'"
                     :class="tab === 'advanced' ? 'bg-black/10 dark:bg-white/10 text-black dark:text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'"
                     class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors">
-                {{ __('Advanced') }}
+                {{ __('app.teacher.agents.form.tabs.advanced') }}
             </button>
             <button type="button"
                     @click="tab = 'monitoring'"
                     :class="tab === 'monitoring' ? 'bg-black/10 dark:bg-white/10 text-black dark:text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'"
                     class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors">
-                {{ __('Monitoring') }}
+                {{ __('app.teacher.agents.form.tabs.monitoring') }}
             </button>
             @if ($isEditing)
             <button type="button"
                     @click="tab = 'attachments'"
                     :class="tab === 'attachments' ? 'bg-black/10 dark:bg-white/10 text-black dark:text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'"
                     class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors">
-                {{ __('Attachments') }}
+                {{ __('app.teacher.agents.form.tabs.attachments') }}
             </button>
             @endif
         </div>
@@ -50,14 +50,14 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
         <div class="px-5 py-4">
             <label for="name"
                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {{ __('Name') }}
+                {{ __('app.teacher.agents.form.name') }}
             </label>
             <input id="name"
                    name="name"
                    type="text"
                    value="{{ old('name', $agent->name ?? '') }}"
                    class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15"
-                   placeholder="{{ __('e.g. History Tutor') }}"
+                   placeholder="{{ __('app.teacher.agents.form.name_placeholder') }}"
                    required
                    maxlength="100">
             @error('name')
@@ -68,14 +68,14 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
         <div class="px-5 py-4">
             <label for="description"
                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {{ __('Short Description') }}
+                {{ __('app.teacher.agents.form.short_description') }}
             </label>
             <input id="description"
                    name="description"
                    type="text"
                    value="{{ old('description', $agent->description ?? '') }}"
                    class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15"
-                   placeholder="{{ __('e.g. Helps you study history topics') }}"
+                   placeholder="{{ __('app.teacher.agents.form.short_description_placeholder') }}"
                    maxlength="300">
             @error('description')
             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -85,15 +85,15 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
         <div class="px-5 py-4">
             <label for="image"
                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {{ __('Image') }}
+                {{ __('app.teacher.agents.form.image') }}
             </label>
             @if ($isEditing && $agent->image_path)
             <div class="mb-2">
                 <img src="{{ $agent->image_url }}"
                      alt="{{ $agent->name }}"
                      class="h-20 w-20 rounded-lg object-cover border border-black/10 dark:border-white/10">
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Upload a new image to replace the
-                    current one.') }}</p>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{
+                    __('app.teacher.agents.form.upload_new_image') }}</p>
             </div>
             @endif
             <input id="image"
@@ -109,13 +109,13 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
         <div class="px-5 py-4">
             <label for="instructions"
                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {{ __('Instructions') }}
+                {{ __('app.teacher.agents.form.instructions') }}
             </label>
             <textarea id="instructions"
                       name="instructions"
                       rows="8"
                       class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15 resize-y"
-                      placeholder="{{ __('Describe how the agent should behave…') }}"
+                      placeholder="{{ __('app.teacher.agents.form.instructions_placeholder') }}"
                       required
                       maxlength="10000">{{ old('instructions', $agent->instructions ?? '') }}</textarea>
             @error('instructions')
@@ -138,7 +138,7 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
             }"
              x-init="$watch('hasTimeWindow', val => { if (!val) { availableFrom = ''; availableUntil = ''; } })">
             <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
-                {{ __('Availability') }}
+                {{ __('app.teacher.agents.form.availability') }}
             </p>
 
             <input type="hidden"
@@ -146,20 +146,21 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                    :value="enabled ? '1' : '0'">
 
             <x-toggle model="enabled"
-                      :on-label="__('Enabled')"
-                      :off-label="__('Disabled')"
+                      :on-label="__('app.teacher.agents.form.enabled')"
+                      :off-label="__('app.teacher.agents.form.disabled')"
                       class="mb-4" />
 
             <div x-show="enabled">
                 <x-toggle model="hasTimeWindow"
-                          :on-label="__('Restricted to a time window')"
-                          :off-label="__('Not restricted to a time window')"
+                          :on-label="__('app.teacher.agents.form.restricted_time_window')"
+                          :off-label="__('app.teacher.agents.form.not_restricted_time_window')"
                           class="mb-4" />
 
                 <div x-show="hasTimeWindow"
                      class="flex items-end gap-3">
                     <div>
-                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('From') }}</label>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{
+                            __('app.teacher.agents.form.from') }}</label>
                         <input type="time"
                                name="available_from"
                                x-model="availableFrom"
@@ -170,7 +171,8 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                     </div>
                     <span class="pb-2 text-gray-400">–</span>
                     <div>
-                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('Until') }}</label>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{
+                            __('app.teacher.agents.form.until') }}</label>
                         <input type="time"
                                name="available_until"
                                x-model="availableUntil"
@@ -180,7 +182,7 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                         @enderror
                     </div>
                     <div class="pb-2 text-xs text-gray-400 dark:text-gray-500">
-                        {{ __('Current server time:') }} {{ now()->format('H:i') }}
+                        {{ __('app.teacher.agents.form.current_server_time') }} {{ now()->format('H:i') }}
                     </div>
                 </div>
             </div>
@@ -188,10 +190,9 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
 
         <div class="px-5 py-4">
             <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {{ __('Accessible to Groups') }}
+                {{ __('app.teacher.agents.form.groups_heading') }}
             </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ __('Select which groups can access this agent.
-                Teachers always have access.') }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ __('app.teacher.agents.form.groups_help') }}</p>
             @if (!empty($groups))
             @php $selectedGroups = array_map('intval', old('allowed_groups', $isEditing ? ($agent->allowed_groups ?? [])
             : [])); @endphp
@@ -226,18 +227,18 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                 <div class="flex items-center gap-2 mb-2">
                     <input x-model="search"
                            type="text"
-                           placeholder="{{ __('Search groups…') }}"
+                           placeholder="{{ __('app.teacher.agents.form.search_groups') }}"
                            @keydown.enter.prevent
                            class="flex-1 rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-1.5 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
                     <button type="button"
                             @click="checkAll()"
                             class="shrink-0 rounded-lg border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                        {{ __('Select all') }}
+                        {{ __('app.teacher.agents.form.select_all') }}
                     </button>
                     <button type="button"
                             @click="checkNone()"
                             class="shrink-0 rounded-lg border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                        {{ __('Select none') }}
+                        {{ __('app.teacher.agents.form.select_none') }}
                     </button>
                 </div>
                 <div class="h-52 overflow-y-auto rounded-lg border border-black/10 dark:border-white/10 p-1">
@@ -255,12 +256,13 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                     </template>
                     <p x-show="filtered.length === 0"
                        class="py-4 text-center text-xs text-gray-400 dark:text-gray-500 italic">
-                        {{ __('No groups match your search.') }}
+                        {{ __('app.teacher.agents.form.no_groups_match') }}
                     </p>
                 </div>
             </div>
             @else
-            <p class="text-xs text-gray-400 dark:text-gray-500 italic">{{ __('No groups available.') }}</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500 italic">{{
+                __('app.teacher.agents.form.no_groups_available') }}</p>
             @endif
             @error('allowed_groups')
             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -273,11 +275,10 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
         @if (isset($models) && is_array($models) && count($models) > 0)
         <div class="px-5 py-4">
             <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {{ __('Student-Selectable Models') }}
+                {{ __('app.teacher.agents.form.student_selectable_models') }}
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                {{ __('Choose which OpenAI models students can pick for this agent. Sorted by overall estimated price
-                per 1M tokens (cheapest first). Leave empty to always use the system default.') }}
+                {{ __('app.teacher.agents.form.student_selectable_models_help') }}
             </p>
             @php $selectedModels = array_values(old('allowed_models', $isEditing ? ($agent->allowed_models ?? []) :
             [])); @endphp
@@ -310,18 +311,18 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                 <div class="flex items-center gap-2 mb-2">
                     <input x-model="search"
                            type="text"
-                           placeholder="{{ __('Search models…') }}"
+                           placeholder="{{ __('app.teacher.agents.form.search_models') }}"
                            @keydown.enter.prevent
                            class="flex-1 rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-1.5 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
                     <button type="button"
                             @click="checkAll()"
                             class="shrink-0 rounded-lg border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                        {{ __('Select all') }}
+                        {{ __('app.teacher.agents.form.select_all') }}
                     </button>
                     <button type="button"
                             @click="checkNone()"
                             class="shrink-0 rounded-lg border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                        {{ __('Select none') }}
+                        {{ __('app.teacher.agents.form.select_none') }}
                     </button>
                 </div>
                 <div class="h-52 overflow-y-auto rounded-lg border border-black/10 dark:border-white/10 p-1">
@@ -342,7 +343,7 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                     </template>
                     <p x-show="filtered.length === 0"
                        class="py-4 text-center text-xs text-gray-400 dark:text-gray-500 italic">
-                        {{ __('No models match your search.') }}
+                        {{ __('app.teacher.agents.form.no_models_match') }}
                     </p>
                 </div>
             </div>
@@ -359,15 +360,11 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
              x-data="{ monitoringEnabled: {{ old('monitoring_is_enabled', $isEditing ? ($agent->monitoring_is_enabled ? '1' : '0') : '0') !== '0' ? 'true' : 'false' }} }">
 
             <p class="mb-4 block text-sm text-gray-700 dark:text-gray-400 mb-2">
-                {{
-                __('The monitoring function allows you to have the system observes the chat messages
-                the student sends to this agent. This way you can identify notable events, such as
-                smart questions, or moments where the student gets stuck.')
-                }}
+                {{ __('app.teacher.agents.form.monitoring_help') }}
             </p>
 
             <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
-                {{ __('Monitoring') }}
+                {{ __('app.teacher.agents.form.tabs.monitoring') }}
             </p>
 
             <input type="hidden"
@@ -375,21 +372,21 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                    :value="monitoringEnabled ? '1' : '0'">
 
             <x-toggle model="monitoringEnabled"
-                      :on-label="__('Monitoring enabled')"
-                      :off-label="__('Monitoring disabled')"
+                      :on-label="__('app.teacher.agents.form.monitoring_enabled')"
+                      :off-label="__('app.teacher.agents.form.monitoring_disabled')"
                       class="mb-4" />
 
             <div x-show="monitoringEnabled">
                 <div class="mb-4">
                     <label for="monitoring_instructions"
                            class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {{ __('Monitoring Instructions') }}
+                        {{ __('app.teacher.agents.form.monitoring_instructions') }}
                     </label>
                     <textarea id="monitoring_instructions"
                               name="monitoring_instructions"
                               rows="6"
                               class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15 resize-y"
-                              placeholder="{{ __('Describe how the monitoring agent should observe chats and when to use the ReportObservation tool…') }}"
+                              placeholder="{{ __('app.teacher.agents.form.monitoring_instructions_placeholder') }}"
                               maxlength="10000">{{ old('monitoring_instructions', $agent->monitoring_instructions ?? '') }}</textarea>
                     @error('monitoring_instructions')
                     <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -400,14 +397,14 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                 <div class="mb-2">
                     <label for="monitoring_model"
                            class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {{ __('Model for Monitoring Agent') }}
+                        {{ __('app.teacher.agents.form.monitoring_model') }}
                     </label>
                     @php $currentMonitoringModel = old('monitoring_model', $isEditing ? ($agent->monitoring_model ?? '')
                     : ''); @endphp
                     <select id="monitoring_model"
                             name="monitoring_model"
                             class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
-                        <option value="">{{ __('Use system default') }}</option>
+                        <option value="">{{ __('app.teacher.agents.form.use_system_default') }}</option>
                         @foreach ($models as $m)
                         <option value="{{ $m['id'] }}"
                                 @if($currentMonitoringModel===$m['id'])
@@ -431,12 +428,11 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
          x-cloak>
         <div class="px-5 py-4">
             <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
-                {{ __('Teacher Attachments') }}
+                {{ __('app.teacher.agents.form.teacher_attachments') }}
             </p>
 
             <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
-                {{ __('Upload documents that the AI can reference. Files are stored privately and also uploaded to the
-                AI provider. Students’ chats with this agent will include these as attachments.') }}
+                {{ __('app.teacher.agents.form.attachments_help') }}
             </p>
 
             <div class="mb-4 flex items-center gap-3">
@@ -449,7 +445,7 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                 <button type="submit"
                         form="agent-attachments-upload"
                         class="shrink-0 inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition-opacity">
-                    {{ __('Upload') }}
+                    {{ __('app.common.upload') }}
                 </button>
             </div>
             @error('attachment')
@@ -478,21 +474,21 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
                     <div class="shrink-0 flex items-center gap-2">
                         <a href="{{ route('teacher.agents.attachments.download', [$agent, $att['id'] ?? '']) }}"
                            class="rounded-lg border border-black/10 dark:border-white/10 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{{
-                            __('Download') }}</a>
+                            __('app.common.download') }}</a>
                         <form method="POST"
                               action="{{ route('teacher.agents.attachments.destroy', [$agent, $att['id'] ?? '']) }}"
-                              onsubmit="return confirm('{{ __('Delete this attachment?') }}')">
+                              onsubmit="return confirm('{{ __('app.teacher.agents.form.delete_attachment_confirm') }}')">
                             @csrf
                             @method('DELETE')
                             <button type="submit"
                                     class="rounded-lg border border-black/10 dark:border-white/10 px-2 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors">{{
-                                __('Delete') }}</button>
+                                __('app.common.delete') }}</button>
                         </form>
                     </div>
                 </div>
                 @empty
-                <p class="px-3 py-6 text-center text-xs text-gray-400 dark:text-gray-500 italic">{{ __('No attachments
-                    uploaded yet.') }}</p>
+                <p class="px-3 py-6 text-center text-xs text-gray-400 dark:text-gray-500 italic">{{
+                    __('app.teacher.agents.form.no_attachments_yet') }}</p>
                 @endforelse
             </div>
         </div>

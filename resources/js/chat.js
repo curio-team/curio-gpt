@@ -25,7 +25,6 @@ marked.use({ renderer, breaks: true, gfm: true });
 
 const COPY_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
 const CHECK_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
-const SEND_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>`;
 const EDIT_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
@@ -98,11 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
      * @type {{ branchFromConversationId: string, keepMessageCount: number, removed: Array<{type: string, text: string, el: Element}> } | null}
      */
     let pendingEdit = null;
-
-    // ─ Send icon in submit button ─────────────────────────────────────────────
-    if (sendBtn) {
-        sendBtn.innerHTML = SEND_ICON + ' Send';
-    }
 
     // ─ Auto-resize textarea ───────────────────────────────────────────────────
     function autoResize() {
@@ -195,12 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setEditMode(active) {
         if (active) {
-            sendBtn.innerHTML = SEND_ICON + ' Send edit';
-            promptEl.placeholder = 'Edit message…';
             cancelEditBtn?.style.removeProperty('display');
         } else {
-            sendBtn.innerHTML = SEND_ICON + ' Send';
-            promptEl.placeholder = 'Message CurioGPT…';
             cancelEditBtn?.style.setProperty('display', 'none');
         }
     }

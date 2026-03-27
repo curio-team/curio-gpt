@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('Chat - :student', ['student' => $conversation->student_name ?? __('Unknown')]) . ' - ' .
+@section('title', __('app.teacher.chats.show.page_title', ['student' => $conversation->student_name ??
+__('app.common.unknown')]) . ' - ' .
 config('app.name', 'CurioGPT'))
 
 @section('container-class', 'mx-auto max-w-3xl px-4 py-8 w-full overflow-y-auto')
@@ -11,11 +12,11 @@ config('app.name', 'CurioGPT'))
     <div class="mb-6">
         <a href="{{ route('teacher.chats.index') }}"
            class="text-xs text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
-            ← {{ __('Back to Chats') }}
+            ← {{ __('app.teacher.chats.show.back') }}
         </a>
         <div class="mt-3 flex items-center gap-3 flex-wrap">
             <h1 class="text-xl font-semibold text-black dark:text-white">
-                {{ $conversation->student_name ?? __('Unknown student') }}
+                {{ $conversation->student_name ?? __('app.common.unknown_student') }}
             </h1>
             @if ($conversation->agent_name)
             <span
@@ -28,7 +29,7 @@ config('app.name', 'CurioGPT'))
     </div>
 
     @if ($messages->isEmpty())
-    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No messages in this conversation.') }}</p>
+    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('app.teacher.chats.show.no_messages') }}</p>
     @else
     @php
     $userBubble = 'max-w-[80%] rounded-2xl rounded-tr-sm bg-black dark:bg-white text-white dark:text-black px-4 py-2.5

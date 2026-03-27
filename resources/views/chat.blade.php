@@ -15,12 +15,12 @@
        class="hidden md:flex flex-col w-60 shrink-0 border-r border-black/10 dark:border-white/10 overflow-hidden">
     <div class="flex items-center justify-between px-4 py-3 border-b border-black/10 dark:border-white/10 shrink-0">
         <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide select-none">{{
-            __('History') }}</span>
+            __('app.common.history') }}</span>
         <button id="new-chat-btn"
                 type="button"
-                title="{{ __('Start a new chat') }}"
+                title="{{ __('app.chat.start_new_chat') }}"
                 class="text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
-            + {{ __('New') }}
+            + {{ __('app.common.new') }}
         </button>
     </div>
     <div id="conversations-list"
@@ -35,7 +35,7 @@
         @if (!empty($agentConfig->allowed_models))
         <div class="mt-4 flex self-end gap-4 items-center justify-between">
             <label for="model-select"
-                   class="text-xs text-gray-500 dark:text-gray-400">{{ __('Model') }}</label>
+                   class="text-xs text-gray-500 dark:text-gray-400">{{ __('app.common.model') }}</label>
             <select id="model-select"
                     name="model"
                     class="rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-2 py-1.5 text-xs text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
@@ -57,27 +57,41 @@
                 <div
                      class="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 shadow-sm focus-within:ring-2 focus-within:ring-black/10 dark:focus-within:ring-white/15 transition-shadow">
                     <label for="prompt"
-                           class="sr-only">{{ __('Message') }}</label>
+                           class="sr-only">{{ __('app.common.message') }}</label>
                     <textarea id="prompt"
                               name="prompt"
+                              placeholder="{{ __('app.common.type_a_message') }}"
                               rows="1"
                               class="w-full resize-none bg-transparent px-4 pt-3.5 pb-2 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none"
-                              placeholder="{{ __('Message') }} {{ $agentConfig->name }}…"></textarea>
+                              placeholder="{{ __('app.common.message') }} {{ $agentConfig->name }}…"></textarea>
                     <div class="flex items-center justify-between px-4 pb-3">
                         <span class="text-xs text-gray-500 dark:text-gray-600 select-none">
-                            {{ __('Enter to send') }} &middot; {{ __('Shift+Enter for new line') }}
+                            {{ __('app.common.enter_to_send') }} &middot; {{ __('app.common.shift_enter_new_line') }}
                         </span>
                         <div class="flex items-center gap-2">
                             <button id="cancel-edit-btn"
                                     type="button"
                                     style="display: none;"
                                     class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:opacity-80 transition-opacity">
-                                {{ __('Cancel edit') }}
+                                {{ __('app.common.cancel_edit') }}
                             </button>
                             <button id="send-btn"
                                     type="submit"
                                     class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-80 disabled:opacity-30 transition-opacity">
-                                {{ __('Send') }}
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     width="13"
+                                     height="13"
+                                     viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2.5"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round"
+                                     aria-hidden="true">
+                                    <path d="m22 2-7 20-4-9-9-4Z" />
+                                    <path d="M22 2 11 13" />
+                                </svg>
+                                {{ __('app.common.send') }}
                             </button>
                         </div>
                     </div>

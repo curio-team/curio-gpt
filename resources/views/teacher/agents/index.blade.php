@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
-@section('title', __('Manage Agents') . ' - ' . config('app.name', 'CurioGPT'))
+@section('title', __('app.teacher.agents.manage_title') . ' - ' . config('app.name', 'CurioGPT'))
 
 @section('content')
 <div class="mx-auto max-w-3xl w-full px-4 py-8">
 
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-xl font-semibold text-black dark:text-white">{{ __('Agents') }}</h1>
+        <h1 class="text-xl font-semibold text-black dark:text-white">{{ __('app.teacher.agents.agents') }}</h1>
         <a href="{{ route('teacher.agents.create') }}"
            class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition-opacity">
-            {{ __('New Agent') }}
+            {{ __('app.teacher.agents.new_agent') }}
         </a>
     </div>
 
@@ -23,7 +23,7 @@
     @if ($agents->isEmpty())
     <div
          class="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 px-6 py-12 text-center">
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No agents yet. Create one to get started.') }}</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('app.teacher.agents.no_agents_yet') }}</p>
     </div>
     @else
     <div
@@ -54,7 +54,7 @@
                     @if (! $agent->is_enabled)
                     <span
                           class="inline-flex items-center rounded-full border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 px-2 py-0.5 text-xs font-medium text-red-600 dark:text-red-400">
-                        {{ __('Disabled') }}
+                        {{ __('app.common.disabled') }}
                     </span>
                     @elseif ($agent->available_from || $agent->available_until)
                     <span
@@ -67,7 +67,7 @@
                     <span
                           class="inline-flex items-center gap-1 rounded-full border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/40 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400">
                         <span class="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-400"></span>
-                        {{ __('Always available') }}
+                        {{ __('app.teacher.agents.always_available') }}
                     </span>
                     @endif
                 </div>
@@ -87,16 +87,16 @@
             <div class="flex shrink-0 items-center gap-2">
                 <a href="{{ route('teacher.agents.edit', $agent) }}"
                    class="text-xs text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
-                    {{ __('Edit') }}
+                    {{ __('app.common.edit') }}
                 </a>
                 <form method="POST"
                       action="{{ route('teacher.agents.destroy', $agent) }}"
-                      onsubmit="return confirm('{{ __('Delete this agent?') }}')">
+                      onsubmit="return confirm('{{ __('app.teacher.agents.delete_confirm') }}')">
                     @csrf
                     @method('DELETE')
                     <button type="submit"
                             class="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors">
-                        {{ __('Delete') }}
+                        {{ __('app.common.delete') }}
                     </button>
                 </form>
             </div>
@@ -109,12 +109,12 @@
     <div class="mt-8">
         <a href="{{ route('teacher.chats.index') }}"
            class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
-            {{ __('→ View all student chats') }}
+            {{ __('app.teacher.agents.view_all_student_chats') }}
         </a>
         <span class="mx-2 text-gray-400">·</span>
         <a href="{{ route('teacher.observations.index') }}"
            class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
-            {{ __('Agent Observations') }}
+            {{ __('app.teacher.agents.observations') }}
         </a>
     </div>
 

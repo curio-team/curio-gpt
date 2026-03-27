@@ -70,7 +70,7 @@ class AgentConfigController extends Controller
         ]);
 
         return redirect()->route('teacher.agents.index')
-            ->with('success', 'Agent created successfully.');
+            ->with('success', __('app.teacher.agents.flash.created'));
     }
 
     public function edit(AgentConfig $agent): View
@@ -114,7 +114,7 @@ class AgentConfigController extends Controller
         $agent->update($validated);
 
         return redirect()->route('teacher.agents.index')
-            ->with('success', 'Agent updated successfully.');
+            ->with('success', __('app.teacher.agents.flash.updated'));
     }
 
     public function destroy(AgentConfig $agent): RedirectResponse
@@ -126,7 +126,7 @@ class AgentConfigController extends Controller
         $agent->delete();
 
         return redirect()->route('teacher.agents.index')
-            ->with('success', 'Agent deleted.');
+            ->with('success', __('app.teacher.agents.flash.deleted'));
     }
 
     /**
@@ -161,14 +161,14 @@ class AgentConfigController extends Controller
 
             $agent->update(['attachments' => $attachments]);
 
-            return back()->with('success', __('Attachment uploaded.'));
+            return back()->with('success', __('app.teacher.agents.flash.attachment_uploaded'));
         } catch (\Throwable $e) {
             // Best-effort cleanup of local file if we created one but provider failed
             if (isset($path)) {
                 Storage::disk('local')->delete($path);
             }
 
-            return back()->withErrors(['attachment' => __('Upload failed: :msg', ['msg' => $e->getMessage()])]);
+            return back()->withErrors(['attachment' => __('app.teacher.agents.flash.upload_failed', ['msg' => $e->getMessage()])]);
         }
     }
 
@@ -200,7 +200,7 @@ class AgentConfigController extends Controller
         $attachment = $attachments->firstWhere('id', $attachmentId);
 
         if (! $attachment) {
-            return back()->withErrors(['attachment' => __('Attachment not found.')]);
+            return back()->withErrors(['attachment' => __('app.teacher.agents.flash.attachment_not_found')]);
         }
 
         // Delete from provider (best-effort)
@@ -220,7 +220,7 @@ class AgentConfigController extends Controller
         $remaining = $attachments->reject(fn ($a) => ($a['id'] ?? null) === $attachmentId)->values()->all();
         $agent->update(['attachments' => $remaining]);
 
-        return back()->with('success', __('Attachment deleted.'));
+        return back()->with('success', __('app.teacher.agents.flash.attachment_deleted'));
     }
 
     /**
@@ -261,9 +261,9 @@ class AgentConfigController extends Controller
             $sortKey = $overall !== null ? (float) $overall : 999999.0;
 
             if ($overall !== null) {
-                $display = sprintf('  (~$%.3f per 1M)', $overall);
+                $display = '  '.__('app.teacher.agents.form.per_million_cost', ['price' => number_format($overall, 3)]);
             } else {
-                $display = '  (pricing unknown)';
+                $display = '  ('.__('app.teacher.agents.form.pricing_unknown').')';
             }
 
             return [

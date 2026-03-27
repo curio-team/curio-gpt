@@ -1,15 +1,16 @@
 @extends('layouts.app')
 
-@section('title', ($errorCode ?? '') . ' – ' . ($title ?? __('Error')) . ' - ' . config('app.name', 'CurioGPT'))
+@section('title', ($errorCode ?? '') . ' – ' . ($title ?? __('app.errors.error')) . ' - ' . config('app.name',
+'CurioGPT'))
 
 @section('content')
 
 @php
 $code = $errorCode ?? '500';
-$heading = $title ?? __('Something went wrong');
-$body = $message ?? __('An unexpected error occurred. Please try again later.');
+$heading = $title ?? __('app.errors.something_wrong');
+$body = $message ?? __('app.errors.unexpected_error');
 $url = $redirectUrl ?? '/';
-$label = $redirectLabel ?? __('Go back home');
+$label = $redirectLabel ?? __('app.errors.go_back_home');
 @endphp
 
 <div class="flex flex-col items-center justify-center flex-1 px-4 py-12">
