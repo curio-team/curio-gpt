@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 
 class OpenAiModelService
@@ -29,9 +28,9 @@ class OpenAiModelService
                 if ($response->ok()) {
                     $ids = collect($response->json('data', []))
                         ->pluck('id')
-                        ->filter(fn($id) => is_string($id))
+                        ->filter(fn ($id) => is_string($id))
                         // Rough filter to interactive chat-capable models
-                        ->filter(fn(string $id) => str_starts_with($id, 'gpt-') || str_starts_with($id, 'o'))
+                        ->filter(fn (string $id) => str_starts_with($id, 'gpt-') || str_starts_with($id, 'o'))
                         ->unique()
                         ->values()
                         ->all();
@@ -51,6 +50,7 @@ class OpenAiModelService
                             if ($pb === false) {
                                 return -1;
                             }
+
                             return $pa <=> $pb;
                         });
 
