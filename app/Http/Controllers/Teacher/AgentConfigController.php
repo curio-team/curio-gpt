@@ -9,6 +9,7 @@ use App\Services\OpenAiModelService;
 use App\Services\SdApiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -130,6 +131,22 @@ class AgentConfigController extends Controller
     }
 
     /**
+     * Revoke student access to all conversation history for this agent.
+     * Sets revoked_at on all related conversations; data remains for teachers.
+     */
+    public function revokeHistory(AgentConfig $agent): RedirectResponse
+    {
+        DB::table('agent_conversations')
+            ->where('agent_config_id', $agent->id)
+            ->whereNull('revoked_at')
+            ->update(['revoked_at' => now()]);
+
+        return redirect()
+            ->route('teacher.agents.index')
+            ->with('success', __('app.teacher.agents.flash.history_revoked'));
+    }
+
+    /**
      * Upload an attachment for the given agent: store privately and upload to provider.
      */
     public function storeAttachment(Request $request, AgentConfig $agent): RedirectResponse
@@ -142,7 +159,7 @@ class AgentConfigController extends Controller
             $file = $validated['attachment'];
 
             // Store privately on local disk
-            $path = $file->store('agent-attachments/'.$agent->id, 'local');
+            $path = $file->store('agent-attachments/' . $agent->id, 'local');
 
             // Upload to provider via Laravel AI SDK
             $stored = AiDocument::fromStorage($path, disk: 'local')->put();
@@ -217,7 +234,7 @@ class AgentConfigController extends Controller
             Storage::disk('local')->delete($attachment['storage_path']);
         }
 
-        $remaining = $attachments->reject(fn ($a) => ($a['id'] ?? null) === $attachmentId)->values()->all();
+        $remaining = $attachments->reject(fn($a) => ($a['id'] ?? null) === $attachmentId)->values()->all();
         $agent->update(['attachments' => $remaining]);
 
         return back()->with('success', __('app.teacher.agents.flash.attachment_deleted'));
@@ -261,9 +278,9 @@ class AgentConfigController extends Controller
             $sortKey = $overall !== null ? (float) $overall : 999999.0;
 
             if ($overall !== null) {
-                $display = '  '.__('app.teacher.agents.form.per_million_cost', ['price' => number_format($overall, 3)]);
+                $display = '  ' . __('app.teacher.agents.form.per_million_cost', ['price' => number_format($overall, 3)]);
             } else {
-                $display = '  ('.__('app.teacher.agents.form.pricing_unknown').')';
+                $display = '  (' . __('app.teacher.agents.form.pricing_unknown') . ')';
             }
 
             return [

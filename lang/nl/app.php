@@ -52,6 +52,8 @@ return [
             'delete_confirm' => 'Deze agent verwijderen?',
             'view_all_student_chats' => '→ Alle studentchats bekijken',
             'observations' => 'Agentobservaties',
+            'revoke_history' => 'Geschiedenis intrekken',
+            'revoke_history_confirm' => 'Weet je zeker dat je de gesprekshistorie voor studenten voor deze agent wilt intrekken? Dit zal direct alle bestaande gesprekken voor studenten verbergen, maar docenten kunnen ze nog steeds bekijken.',
 
             'flash' => [
                 'created' => 'Agent succesvol aangemaakt.',
@@ -61,6 +63,7 @@ return [
                 'upload_failed' => 'Upload mislukt: :msg',
                 'attachment_not_found' => 'Bijlage niet gevonden.',
                 'attachment_deleted' => 'Bijlage verwijderd.',
+                'history_revoked' => 'Gesprekshistorie is ingetrokken voor studenten van deze agent.',
             ],
 
             'create' => [

@@ -43,6 +43,9 @@ Route::middleware(['auth', EnsureUserIsTeacher::class])
         Route::get('agents/{agent}/attachments/{attachmentId}/download', [AgentConfigController::class, 'downloadAttachment'])
             ->name('agents.attachments.download');
 
+        Route::post('agents/{agent}/revoke-history', [AgentConfigController::class, 'revokeHistory'])
+            ->name('agents.revokeHistory');
+
         Route::get('chats', [TeacherChatController::class, 'index'])->name('chats.index');
         Route::get('chats/{conversation}', [TeacherChatController::class, 'show'])->name('chats.show');
 

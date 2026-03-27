@@ -24,9 +24,15 @@ class ConversationController extends Controller
             }
         }
 
-        $conversations = DB::table('agent_conversations')
+        $query = DB::table('agent_conversations')
             ->where('user_id', $request->user()->id)
-            ->where('agent_config_id', $validated['agentConfigId'])
+            ->where('agent_config_id', $validated['agentConfigId']);
+
+        if (! $request->user()->isTeacher()) {
+            $query->whereNull('revoked_at');
+        }
+
+        $conversations = $query
             ->orderByDesc('updated_at')
             ->limit(50)
             ->get(['id', 'title', 'updated_at']);
@@ -36,10 +42,15 @@ class ConversationController extends Controller
 
     public function messages(Request $request, string $conversationId): JsonResponse
     {
-        $conversation = DB::table('agent_conversations')
+        $conversationQuery = DB::table('agent_conversations')
             ->where('id', $conversationId)
-            ->where('user_id', $request->user()->id)
-            ->first();
+            ->where('user_id', $request->user()->id);
+
+        if (! $request->user()->isTeacher()) {
+            $conversationQuery->whereNull('revoked_at');
+        }
+
+        $conversation = $conversationQuery->first();
 
         abort_if(is_null($conversation), 404);
 

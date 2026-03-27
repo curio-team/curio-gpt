@@ -52,6 +52,8 @@ return [
             'delete_confirm' => 'Delete this agent?',
             'view_all_student_chats' => '→ View all student chats',
             'observations' => 'Agent Observations',
+            'revoke_history' => 'Revoke history',
+            'revoke_history_confirm' => 'Are you sure you want to revoke conversation history for students for this agent? This will immediately hide all existing conversations for students, but teachers can still view them.',
 
             'flash' => [
                 'created' => 'Agent created successfully.',
@@ -61,6 +63,7 @@ return [
                 'upload_failed' => 'Upload failed: :msg',
                 'attachment_not_found' => 'Attachment not found.',
                 'attachment_deleted' => 'Attachment deleted.',
+                'history_revoked' => 'Conversation history has been revoked for students for this agent.',
             ],
 
             'create' => [

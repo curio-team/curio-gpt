@@ -89,13 +89,23 @@
                    class="text-xs text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
                     {{ __('app.common.edit') }}
                 </a>
+
+                <form method="POST"
+                      action="{{ route('teacher.agents.revokeHistory', $agent) }}"
+                      onsubmit="return confirm('{{ __('app.teacher.agents.revoke_history_confirm') }}')">
+                    @csrf
+                    <button type="submit"
+                            class="cursor-pointer text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors">
+                        {{ __('app.teacher.agents.revoke_history') }}
+                    </button>
+                </form>
                 <form method="POST"
                       action="{{ route('teacher.agents.destroy', $agent) }}"
                       onsubmit="return confirm('{{ __('app.teacher.agents.delete_confirm') }}')">
                     @csrf
                     @method('DELETE')
                     <button type="submit"
-                            class="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors">
+                            class="cursor-pointer text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors">
                         {{ __('app.common.delete') }}
                     </button>
                 </form>
