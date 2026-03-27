@@ -8,6 +8,7 @@
 
     <title>@yield('title', config('app.name', 'CurioGPT'))</title>
 
+    {{--
     <link rel="icon"
           href="/favicon.ico"
           sizes="any">
@@ -16,6 +17,7 @@
           type="image/svg+xml">
     <link rel="apple-touch-icon"
           href="/apple-touch-icon.png">
+    --}}
 
     <link rel="preconnect"
           href="https://fonts.bunny.net">
@@ -33,6 +35,18 @@
                class="font-semibold tracking-tight text-lg text-black dark:text-white">CurioGPT</a>
             <nav class="flex items-center gap-3">
                 @auth
+                @if (auth()->user()->isTeacher())
+                <a href="{{ route('teacher.agents.index') }}"
+                   class="text-sm text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
+                    {{ __('Manage Agents') }}
+                </a>
+                <span class="text-gray-300 dark:text-gray-700 select-none">·</span>
+                <a href="{{ route('teacher.chats.index') }}"
+                   class="text-sm text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
+                    {{ __('Chats') }}
+                </a>
+                <span class="text-gray-300 dark:text-gray-700 select-none">·</span>
+                @endif
                 <span class="text-sm text-gray-700 dark:text-gray-300">{{ auth()->user()->name }}</span>
                 @else
                 <a href="{{ route('login') }}"

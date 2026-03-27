@@ -81,8 +81,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusEl = document.getElementById('status');
     const sendBtn = document.getElementById('send-btn');
     const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    const agentSelectEl = document.getElementById('agent-select');
+    const agentSelectorErrorEl = document.getElementById('agent-selector-error');
     let conversationId = null;
+    let selectedAgentConfigId = null;
     let isStreaming = false;
+
+    // ─ Load agents ────────────────────────────────────────────────────────────
+    if (agentSelectEl) {
+        ensureCsrfCookie().then(() => {
+            fetch('/api/agents', {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+            })
+                .then((r) => r.json())
+                .then((agents) => {
+                    agents.forEach((agent) => {
+                        const opt = document.createElement('option');
+                        opt.value = agent.id;
+                        opt.textContent = agent.name;
+                        agentSelectEl.appendChild(opt);
+                    });
+                })
+                .catch(() => { });
+        });
+
+        agentSelectEl.addEventListener('change', () => {
+            selectedAgentConfigId = agentSelectEl.value || null;
+            if (agentSelectorErrorEl) {
+                agentSelectorErrorEl.classList.toggle('hidden', selectedAgentConfigId !== null);
+            }
+        });
+    }
 
     /**
      * Tracks all rendered messages in order: [{type, text, el}]
@@ -208,6 +238,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (emptyStateEl) {
             emptyStateEl.style.display = 'none';
         }
+
+        // Lock agent selection once the conversation starts
+        if (agentSelectEl && !agentSelectEl.disabled) {
+            agentSelectEl.disabled = true;
+        }
     }
 
     function scrollBottom() {
@@ -285,6 +320,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (agentSelectEl && !selectedAgentConfigId) {
+            if (agentSelectorErrorEl) {
+                agentSelectorErrorEl.classList.remove('hidden');
+            }
+            agentSelectEl.focus();
+            return;
+        }
+
         promptEl.value = '';
         promptEl.style.height = 'auto';
 
@@ -306,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await ensureCsrfCookie();
 
-            const body = { prompt };
+            const body = { prompt, agentConfigId: selectedAgentConfigId };
 
             if (branchFrom) {
                 body.branchFrom = branchFrom;

@@ -10,5 +10,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    Route::get('/agents', [CustomAgentController::class, 'agents']);
     Route::post('/agent', [CustomAgentController::class, 'handle']);
 });

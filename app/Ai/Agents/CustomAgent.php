@@ -15,7 +15,7 @@ class CustomAgent implements Agent, Conversational, HasTools
     use Promptable, RemembersConversations;
 
     public function __construct(
-        // public AgentSetup $setup = null,
+        private string $agentInstructions = 'You are a helpful assistant.',
     ) {}
 
     /**
@@ -23,8 +23,7 @@ class CustomAgent implements Agent, Conversational, HasTools
      */
     public function instructions(): Stringable|string
     {
-        // TODO: This is where we'll define the agent's instructions based on the setup. For now, we'll just return a simple instruction.
-        return 'You are a helpful assistant.';
+        return $this->agentInstructions;
     }
 
     /**

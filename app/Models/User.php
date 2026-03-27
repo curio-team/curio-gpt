@@ -44,4 +44,12 @@ class User extends Authenticatable
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
+
+    /**
+     * Returns whether the user is a teacher.
+     */
+    public function isTeacher(): bool
+    {
+        return $this->type === 'teacher';
+    }
 }

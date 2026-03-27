@@ -4,29 +4,43 @@ namespace App\Http\Controllers\Api;
 
 use App\Ai\Agents\CustomAgent;
 use App\Http\Controllers\Controller;
+use App\Models\AgentConfig;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CustomAgentController extends Controller
 {
+    public function agents(): JsonResponse
+    {
+        $agents = AgentConfig::orderBy('name')
+            ->get(['id', 'name']);
+
+        return response()->json($agents);
+    }
+
     public function handle(Request $request)
     {
         $validated = $request->validate([
             'prompt' => ['required', 'string', 'max:10000'],
+            'agentConfigId' => ['required', 'string', 'size:36'],
             'conversationId' => ['nullable', 'string', 'size:36'],
             'branchFrom' => ['nullable', 'array'],
             'branchFrom.conversationId' => ['required_with:branchFrom', 'string', 'size:36'],
             'branchFrom.keepMessageCount' => ['required_with:branchFrom', 'integer', 'min:0'],
         ]);
 
-        $agent = (new CustomAgent)->forUser($request->user());
+        $agentConfig = AgentConfig::findOrFail($validated['agentConfigId']);
+
+        $agent = (new CustomAgent($agentConfig->instructions))->forUser($request->user());
 
         if (isset($validated['branchFrom'])) {
             $targetConversationId = $this->branchConversation(
                 $request->user(),
                 $validated['branchFrom']['conversationId'],
                 $validated['branchFrom']['keepMessageCount'],
+                $agentConfig->id,
             );
 
             $agent->continue($targetConversationId, as: $request->user());
@@ -34,13 +48,19 @@ class CustomAgentController extends Controller
             $agent->continue($validated['conversationId'], as: $request->user());
         }
 
+        $agentConfigId = $agentConfig->id;
         $stream = $agent->stream($validated['prompt']);
 
-        return response()->stream(function () use ($stream) {
+        return response()->stream(function () use ($stream, $agentConfigId) {
             $conversationId = null;
 
-            $stream->then(function ($response) use (&$conversationId) {
+            $stream->then(function ($response) use (&$conversationId, $agentConfigId) {
                 $conversationId = $response->conversationId;
+
+                DB::table('agent_conversations')
+                    ->where('id', $conversationId)
+                    ->whereNull('agent_config_id')
+                    ->update(['agent_config_id' => $agentConfigId]);
             });
 
             foreach ($stream as $event) {
@@ -62,7 +82,7 @@ class CustomAgentController extends Controller
      * Create a new conversation branched from an existing one, copying the
      * first $keepMessageCount messages. Returns the new conversation ID.
      */
-    private function branchConversation(object $user, string $sourceConversationId, int $keepMessageCount): string
+    private function branchConversation(object $user, string $sourceConversationId, int $keepMessageCount, string $agentConfigId): string
     {
         $sourceConversation = DB::table('agent_conversations')
             ->where('id', $sourceConversationId)
@@ -82,6 +102,7 @@ class CustomAgentController extends Controller
         DB::table('agent_conversations')->insert([
             'id' => $newConversationId,
             'user_id' => $user->id,
+            'agent_config_id' => $agentConfigId,
             'title' => $sourceConversation->title,
             'created_at' => now(),
             'updated_at' => now(),
