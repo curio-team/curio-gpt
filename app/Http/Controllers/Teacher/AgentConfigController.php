@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
 use App\Models\AgentConfig;
-use App\Services\SdApiService;
+use App\Services\ModelPricingService;
 use App\Services\OpenAiModelService;
+use App\Services\SdApiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +16,8 @@ class AgentConfigController extends Controller
 {
     public function __construct(
         private readonly SdApiService $sdApiService,
-        private readonly OpenAiModelService $openAiModels
+        private readonly OpenAiModelService $openAiModels,
+        private readonly ModelPricingService $pricing,
     ) {}
 
     public function index(): View
@@ -29,7 +31,8 @@ class AgentConfigController extends Controller
     public function create(): View
     {
         $groups = $this->sdApiService->getGroups();
-        $models = $this->openAiModels->listChatModels();
+        $modelIds = $this->openAiModels->listChatModels();
+        $models = $this->mapAndSortModelsWithPricing($modelIds);
 
         return view('teacher.agents.create', compact('groups', 'models'));
     }
@@ -68,7 +71,8 @@ class AgentConfigController extends Controller
     public function edit(AgentConfig $agent): View
     {
         $groups = $this->sdApiService->getGroups();
-        $models = $this->openAiModels->listChatModels();
+        $modelIds = $this->openAiModels->listChatModels();
+        $models = $this->mapAndSortModelsWithPricing($modelIds);
 
         return view('teacher.agents.edit', compact('agent', 'groups', 'models'));
     }
@@ -115,5 +119,65 @@ class AgentConfigController extends Controller
 
         return redirect()->route('teacher.agents.index')
             ->with('success', 'Agent deleted.');
+    }
+
+    /**
+     * Build enriched model list with pricing and sort cheapest first.
+     * Uses a single overall-per-1M estimate (no input/output split) for ranking and display.
+     *
+     * @param  array<int,string>  $modelIds
+     * @return array<int,array{id:string,display:string,input_per_million:float|null,output_per_million:float|null,cached_input_per_million:float|null,overall_per_million:float|null,sort_key:float}>
+     */
+    private function mapAndSortModelsWithPricing(array $modelIds): array
+    {
+        $items = collect($modelIds)->map(function (string $id) {
+            $rates = $this->pricing->getRates($id) ?? [];
+            $input = $rates['input_per_million'] ?? null;
+            $output = $rates['output_per_million'] ?? null;
+            $cached = $rates['cached_input_per_million'] ?? null;
+
+            if ($input !== null) {
+                $input = (float) $input;
+            }
+            if ($output !== null) {
+                $output = (float) $output;
+            }
+            if ($cached !== null) {
+                $cached = (float) $cached;
+            }
+
+            // Compute a single overall per-1M estimate for simpler comparison.
+            $overall = null;
+            if ($input !== null && $output !== null) {
+                $overall = ($input + $output) / 2.0;
+            } elseif ($input !== null) {
+                $overall = $input;
+            } elseif ($output !== null) {
+                $overall = $output;
+            }
+
+            $sortKey = $overall !== null ? (float) $overall : 999999.0;
+
+            if ($overall !== null) {
+                $display = sprintf('  (~$%.3f per 1M)', $overall);
+            } else {
+                $display = '  (pricing unknown)';
+            }
+
+            return [
+                'id' => $id,
+                'display' => $display,
+                'input_per_million' => $input,
+                'output_per_million' => $output,
+                'cached_input_per_million' => $cached,
+                'overall_per_million' => $overall,
+                'sort_key' => $sortKey,
+            ];
+        })
+            ->sortBy([['sort_key', 'asc'], ['id', 'asc']])
+            ->values()
+            ->all();
+
+        return $items;
     }
 }

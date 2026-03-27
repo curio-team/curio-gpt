@@ -84,8 +84,8 @@ $isEditing = isset($agent);
         {{ __('Student-Selectable Models') }}
     </p>
     <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
-        {{ __('Choose which OpenAI models students can pick for this agent. Leave empty to always use the system
-        default.') }}
+        {{ __('Choose which OpenAI models students can pick for this agent. Sorted by overall estimated price per 1M
+        tokens (cheapest first). Leave empty to always use the system default.') }}
     </p>
     @php $selectedModels = array_values(old('allowed_models', $isEditing ? ($agent->allowed_models ?? []) : []));
     @endphp
@@ -96,16 +96,16 @@ $isEditing = isset($agent);
         get filtered() {
             if (!this.search) return this.models;
             const q = this.search.toLowerCase();
-            return this.models.filter(m => m.toLowerCase().includes(q));
+            return this.models.filter(m => (m.id && m.id.toLowerCase().includes(q)) || (m.display && m.display.toLowerCase().includes(q)));
         },
         isSelected(id) { return this.selected.includes(id); },
         toggle(id) {
             const idx = this.selected.indexOf(id);
             if (idx === -1) { this.selected.push(id); } else { this.selected.splice(idx, 1); }
         },
-        checkAll() { this.filtered.forEach(m => { if (!this.selected.includes(m)) this.selected.push(m); }); },
+        checkAll() { this.filtered.forEach(m => { if (!this.selected.includes(m.id)) this.selected.push(m.id); }); },
         checkNone() {
-            const ids = this.filtered;
+            const ids = this.filtered.map(m => m.id);
             this.selected = this.selected.filter(id => !ids.includes(id));
         }
     }">
@@ -134,15 +134,18 @@ $isEditing = isset($agent);
         </div>
         <div class="h-52 overflow-y-auto rounded-lg border border-black/10 dark:border-white/10 p-1">
             <template x-for="m in filtered"
-                      :key="m">
+                      :key="m.id">
                 <label
                        class="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 text-sm text-black dark:text-white">
                     <input type="checkbox"
-                           :checked="isSelected(m)"
-                           @change="toggle(m)"
+                           :checked="isSelected(m.id)"
+                           @change="toggle(m.id)"
                            class="rounded border-black/20 dark:border-white/20 text-black focus:ring-black/10 dark:focus:ring-white/15">
-                    <span x-text="m"
-                          class="truncate"></span>
+                    <div class="flex w-full justify-between">
+                        <span x-text="m.id"></span>
+                        <span x-text="m.display"
+                              class="opacity-50"></span>
+                    </div>
                 </label>
             </template>
             <p x-show="filtered.length === 0"
