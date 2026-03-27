@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-#[Fillable(['name', 'description', 'instructions', 'created_by', 'allowed_groups', 'image_path'])]
+#[Fillable(['name', 'description', 'instructions', 'created_by', 'allowed_groups', 'image_path', 'is_enabled', 'available_from', 'available_until'])]
 class AgentConfig extends Model
 {
     /** @use HasFactory<AgentConfigFactory> */
@@ -38,6 +38,7 @@ class AgentConfig extends Model
     {
         return [
             'allowed_groups' => 'array',
+            'is_enabled' => 'boolean',
         ];
     }
 
@@ -57,6 +58,29 @@ class AgentConfig extends Model
         return Attribute::get(fn () => $this->image_path
             ? Storage::disk('public')->url($this->image_path)
             : null);
+    }
+
+    public function isCurrentlyAvailable(): bool
+    {
+        if (! $this->is_enabled) {
+            return false;
+        }
+
+        if ($this->available_from === null && $this->available_until === null) {
+            return true;
+        }
+
+        $now = now()->format('H:i:s');
+
+        if ($this->available_from !== null && $this->available_until !== null) {
+            return $now >= $this->available_from && $now <= $this->available_until;
+        }
+
+        if ($this->available_from !== null) {
+            return $now >= $this->available_from;
+        }
+
+        return $now <= $this->available_until;
     }
 
     public function creator(): BelongsTo

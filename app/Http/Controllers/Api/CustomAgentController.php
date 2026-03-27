@@ -34,8 +34,12 @@ class CustomAgentController extends Controller
         $userGroupIds = collect($personalInfo['groups'] ?? [])->pluck('id')->all();
 
         $agents = AgentConfig::orderBy('name')
-            ->get(['id', 'name', 'description', 'image_path', 'allowed_groups'])
+            ->get(['id', 'name', 'description', 'image_path', 'allowed_groups', 'is_enabled', 'available_from', 'available_until'])
             ->filter(function (AgentConfig $agent) use ($userGroupIds) {
+                if (! $agent->isCurrentlyAvailable()) {
+                    return false;
+                }
+
                 $allowedGroups = $agent->allowed_groups;
 
                 if (empty($allowedGroups)) {
@@ -69,6 +73,10 @@ class CustomAgentController extends Controller
         $agentConfig = AgentConfig::findOrFail($validated['agentConfigId']);
 
         if (! $request->user()->isTeacher()) {
+            if (! $agentConfig->isCurrentlyAvailable()) {
+                abort(403);
+            }
+
             $personalInfo = $this->sdApiService->getPersonalInfo();
             $userGroupIds = collect($personalInfo['groups'] ?? [])->pluck('id')->all();
 

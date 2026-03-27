@@ -19,8 +19,9 @@ class AgentConfigController extends Controller
     public function index(): View
     {
         $agents = AgentConfig::orderBy('name')->get();
+        $groups = collect($this->sdApiService->getGroups())->keyBy('id');
 
-        return view('teacher.agents.index', compact('agents'));
+        return view('teacher.agents.index', compact('agents', 'groups'));
     }
 
     public function create(): View
@@ -39,6 +40,9 @@ class AgentConfigController extends Controller
             'allowed_groups' => ['nullable', 'array'],
             'allowed_groups.*' => ['integer'],
             'image' => ['nullable', 'image', 'max:2048'],
+            'is_enabled' => ['required', 'boolean'],
+            'available_from' => ['nullable', 'date_format:H:i'],
+            'available_until' => ['nullable', 'date_format:H:i'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -72,6 +76,9 @@ class AgentConfigController extends Controller
             'allowed_groups' => ['nullable', 'array'],
             'allowed_groups.*' => ['integer'],
             'image' => ['nullable', 'image', 'max:2048'],
+            'is_enabled' => ['required', 'boolean'],
+            'available_from' => ['nullable', 'date_format:H:i'],
+            'available_until' => ['nullable', 'date_format:H:i'],
         ]);
 
         if ($request->hasFile('image')) {

@@ -23,6 +23,23 @@ class AgentConfigFactory extends Factory
             'description' => $this->faker->sentence(),
             'instructions' => $this->faker->paragraph(),
             'created_by' => User::factory(),
+            'is_enabled' => true,
+            'available_from' => null,
+            'available_until' => null,
         ];
+    }
+
+    public function disabled(): static
+    {
+        return $this->state(['is_enabled' => false]);
+    }
+
+    public function availableBetween(string $from, string $until): static
+    {
+        return $this->state([
+            'is_enabled' => true,
+            'available_from' => $from,
+            'available_until' => $until,
+        ]);
     }
 }

@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('image_path')->nullable();
             $table->text('instructions');
             $table->json('allowed_groups')->nullable();
+            $table->boolean('is_enabled')->default(true);
+            $table->time('available_from')->nullable();
+            $table->time('available_until')->nullable();
             $table->timestamps();
         });
     }
