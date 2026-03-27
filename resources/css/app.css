@@ -1,8 +1,223 @@
 @import 'tailwindcss';
 
 @source '../views';
+@source '../js';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* ── Markdown prose ──────────────────────────────────── */
+.prose-chat>*+* {
+    margin-top: 0.6em;
+}
+
+.prose-chat>*:first-child {
+    margin-top: 0;
+}
+
+.prose-chat>*:last-child {
+    margin-bottom: 0;
+}
+
+.prose-chat p {
+    line-height: 1.65;
+}
+
+.prose-chat h1 {
+    font-size: 1.4em;
+    font-weight: 700;
+    margin-top: 1em;
+    line-height: 1.2;
+}
+
+.prose-chat h2 {
+    font-size: 1.2em;
+    font-weight: 700;
+    margin-top: 1em;
+    line-height: 1.25;
+}
+
+.prose-chat h3 {
+    font-size: 1.05em;
+    font-weight: 600;
+    margin-top: 0.9em;
+}
+
+.prose-chat h4,
+.prose-chat h5,
+.prose-chat h6 {
+    font-weight: 600;
+    margin-top: 0.75em;
+}
+
+.prose-chat ul {
+    list-style-type: disc;
+    padding-left: 1.4em;
+}
+
+.prose-chat ol {
+    list-style-type: decimal;
+    padding-left: 1.4em;
+}
+
+.prose-chat li {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    line-height: 1.6;
+}
+
+.prose-chat li>ul,
+.prose-chat li>ol {
+    margin-top: 0.2em;
+}
+
+.prose-chat code:not(pre code) {
+    font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+    font-size: 0.82em;
+    background: rgba(0, 0, 0, 0.07);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+}
+
+@media (prefers-color-scheme: dark) {
+    .prose-chat code:not(pre code) {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+.prose-chat pre {
+    margin: 0;
+}
+
+.prose-chat blockquote {
+    border-left: 3px solid rgba(0, 0, 0, 0.18);
+    padding-left: 0.9em;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+@media (prefers-color-scheme: dark) {
+    .prose-chat blockquote {
+        border-left-color: rgba(255, 255, 255, 0.18);
+    }
+}
+
+.prose-chat a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.prose-chat strong {
+    font-weight: 600;
+}
+
+.prose-chat em {
+    font-style: italic;
+}
+
+.prose-chat hr {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 1em 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .prose-chat hr {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+.prose-chat table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.875em;
+}
+
+.prose-chat th,
+.prose-chat td {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    padding: 0.45em 0.7em;
+    text-align: left;
+}
+
+.prose-chat th {
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+
+    .prose-chat th,
+    .prose-chat td {
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .prose-chat th {
+        background: rgba(255, 255, 255, 0.04);
+    }
+}
+
+/* ── Code blocks (injected by chat.js renderer) ──────── */
+.chat-code-block {
+    border-radius: 0.6rem;
+    overflow: hidden;
+    margin: 0.5em 0;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: 0.8125rem;
+}
+
+.chat-code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.35rem 0.75rem;
+    background: #1e2227;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.chat-code-lang {
+    font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: lowercase;
+}
+
+.copy-code-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.4);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.copy-code-btn:hover {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.copy-code-btn:disabled {
+    cursor: default;
+}
+
+.chat-code-block pre {
+    margin: 0;
+    overflow-x: auto;
+    padding: 0;
+}
+
+.chat-code-block pre>code.hljs {
+    font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+    display: block;
+    padding: 0.9rem 1rem;
+    line-height: 1.55;
+    border-radius: 0;
 }

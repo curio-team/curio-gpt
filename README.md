@@ -31,6 +31,11 @@ To get started with Curio GPT, follow these steps:
     cp .env.example .env
     ```
 
+    > [!NOTE]
+    > Be sure to fill at least:
+    > - `OPENAI_API_KEY` with your OpenAI API key.
+    > - `SD_CLIENT_ID` and `SD_CLIENT_SECRET` with a valid SD Client App information.
+
 5. Generate an application key:
 
     ```bash
