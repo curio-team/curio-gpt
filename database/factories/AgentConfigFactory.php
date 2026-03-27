@@ -23,6 +23,7 @@ class AgentConfigFactory extends Factory
             'description' => $this->faker->sentence(),
             'instructions' => $this->faker->paragraph(),
             'created_by' => User::factory(),
+            'allowed_models' => null,
             'is_enabled' => true,
             'available_from' => null,
             'available_until' => null,

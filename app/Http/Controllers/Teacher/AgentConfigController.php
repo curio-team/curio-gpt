@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\AgentConfig;
 use App\Services\SdApiService;
+use App\Services\OpenAiModelService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +14,8 @@ use Illuminate\View\View;
 class AgentConfigController extends Controller
 {
     public function __construct(
-        private readonly SdApiService $sdApiService
+        private readonly SdApiService $sdApiService,
+        private readonly OpenAiModelService $openAiModels
     ) {}
 
     public function index(): View
@@ -27,8 +29,9 @@ class AgentConfigController extends Controller
     public function create(): View
     {
         $groups = $this->sdApiService->getGroups();
+        $models = $this->openAiModels->listChatModels();
 
-        return view('teacher.agents.create', compact('groups'));
+        return view('teacher.agents.create', compact('groups', 'models'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -39,6 +42,8 @@ class AgentConfigController extends Controller
             'instructions' => ['required', 'string', 'max:10000'],
             'allowed_groups' => ['nullable', 'array'],
             'allowed_groups.*' => ['integer'],
+            'allowed_models' => ['nullable', 'array'],
+            'allowed_models.*' => ['string'],
             'image' => ['nullable', 'image', 'max:2048'],
             'is_enabled' => ['required', 'boolean'],
             'available_from' => ['nullable', 'date_format:H:i'],
@@ -63,8 +68,9 @@ class AgentConfigController extends Controller
     public function edit(AgentConfig $agent): View
     {
         $groups = $this->sdApiService->getGroups();
+        $models = $this->openAiModels->listChatModels();
 
-        return view('teacher.agents.edit', compact('agent', 'groups'));
+        return view('teacher.agents.edit', compact('agent', 'groups', 'models'));
     }
 
     public function update(Request $request, AgentConfig $agent): RedirectResponse
@@ -75,6 +81,8 @@ class AgentConfigController extends Controller
             'instructions' => ['required', 'string', 'max:10000'],
             'allowed_groups' => ['nullable', 'array'],
             'allowed_groups.*' => ['integer'],
+            'allowed_models' => ['nullable', 'array'],
+            'allowed_models.*' => ['string'],
             'image' => ['nullable', 'image', 'max:2048'],
             'is_enabled' => ['required', 'boolean'],
             'available_from' => ['nullable', 'date_format:H:i'],

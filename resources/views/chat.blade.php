@@ -32,6 +32,19 @@
 <div class="flex flex-col min-h-0 flex-1 overflow-hidden">
     <div class="flex flex-col min-h-0 flex-1 mx-auto w-full max-w-3xl"
          data-agent-config-id="{{ $agentConfig->id }}">
+        @if (!empty($agentConfig->allowed_models))
+        <div class="mt-4 flex self-end gap-4 items-center justify-between">
+            <label for="model-select"
+                   class="text-xs text-gray-500 dark:text-gray-400">{{ __('Model') }}</label>
+            <select id="model-select"
+                    name="model"
+                    class="rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-2 py-1.5 text-xs text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
+                @foreach ($agentConfig->allowed_models as $model)
+                <option value="{{ $model }}">{{ $model }}</option>
+                @endforeach
+            </select>
+        </div>
+        @endif
 
         {{-- Messages feed --}}
         <div id="messages"

@@ -20,7 +20,7 @@ class CustomAgentController extends Controller
         if ($request->user()->isTeacher()) {
             $agents = AgentConfig::orderBy('name')
                 ->get(['id', 'name', 'description', 'image_path'])
-                ->map(fn (AgentConfig $agent) => [
+                ->map(fn(AgentConfig $agent) => [
                     'id' => $agent->id,
                     'name' => $agent->name,
                     'description' => $agent->description,
@@ -49,7 +49,7 @@ class CustomAgentController extends Controller
                 return count(array_intersect($allowedGroups, $userGroupIds)) > 0;
             })
             ->values()
-            ->map(fn (AgentConfig $agent) => [
+            ->map(fn(AgentConfig $agent) => [
                 'id' => $agent->id,
                 'name' => $agent->name,
                 'description' => $agent->description,
@@ -65,6 +65,7 @@ class CustomAgentController extends Controller
             'prompt' => ['required', 'string', 'max:10000'],
             'agentConfigId' => ['required', 'string', 'size:36'],
             'conversationId' => ['nullable', 'string', 'size:36'],
+            'model' => ['nullable', 'string', 'max:100'],
             'branchFrom' => ['nullable', 'array'],
             'branchFrom.conversationId' => ['required_with:branchFrom', 'string', 'size:36'],
             'branchFrom.keepMessageCount' => ['required_with:branchFrom', 'integer', 'min:0'],
@@ -85,7 +86,8 @@ class CustomAgentController extends Controller
             }
         }
 
-        $agent = (new CustomAgent($agentConfig->instructions))->forUser($request->user());
+        $agent = (new CustomAgent($agentConfig->instructions))
+            ->forUser($request->user());
 
         if (isset($validated['branchFrom'])) {
             $targetConversationId = $this->branchConversation(
@@ -101,7 +103,23 @@ class CustomAgentController extends Controller
         }
 
         $agentConfigId = $agentConfig->id;
-        $stream = $agent->stream($validated['prompt']);
+
+        // Determine model to use. If the teacher configured allowed models, enforce selection.
+        $selectedModel = $validated['model'] ?? null;
+        if (! empty($agentConfig->allowed_models)) {
+            if ($selectedModel && in_array($selectedModel, $agentConfig->allowed_models, true)) {
+                // ok
+            } else {
+                $selectedModel = $agentConfig->allowed_models[0] ?? 'gpt-4o';
+            }
+        } else {
+            // No restriction; use provided or fallback default
+            $selectedModel = $selectedModel ?: 'gpt-4o';
+        }
+        $stream = $agent->stream(
+            $validated['prompt'],
+            model: $selectedModel,
+        );
 
         return response()->stream(function () use ($stream, $agentConfigId) {
             $conversationId = null;
@@ -116,14 +134,14 @@ class CustomAgentController extends Controller
             });
 
             foreach ($stream as $event) {
-                yield 'data: '.((string) $event)."\n\n";
+                yield 'data: ' . ((string) $event) . "\n\n";
             }
 
             if ($conversationId) {
-                yield 'data: '.json_encode([
+                yield 'data: ' . json_encode([
                     'type' => 'conversation_id',
                     'conversation_id' => $conversationId,
-                ])."\n\n";
+                ]) . "\n\n";
             }
 
             yield "data: [DONE]\n\n";

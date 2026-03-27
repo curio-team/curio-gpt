@@ -78,6 +78,85 @@ $isEditing = isset($agent);
     @enderror
 </div>
 
+@if (isset($models) && is_array($models) && count($models) > 0)
+<div class="px-5 py-4">
+    <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ __('Student-Selectable Models') }}
+    </p>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        {{ __('Choose which OpenAI models students can pick for this agent. Leave empty to always use the system
+        default.') }}
+    </p>
+    @php $selectedModels = array_values(old('allowed_models', $isEditing ? ($agent->allowed_models ?? []) : []));
+    @endphp
+    <div x-data="{
+        search: '',
+        models: @js($models),
+        selected: @js($selectedModels),
+        get filtered() {
+            if (!this.search) return this.models;
+            const q = this.search.toLowerCase();
+            return this.models.filter(m => m.toLowerCase().includes(q));
+        },
+        isSelected(id) { return this.selected.includes(id); },
+        toggle(id) {
+            const idx = this.selected.indexOf(id);
+            if (idx === -1) { this.selected.push(id); } else { this.selected.splice(idx, 1); }
+        },
+        checkAll() { this.filtered.forEach(m => { if (!this.selected.includes(m)) this.selected.push(m); }); },
+        checkNone() {
+            const ids = this.filtered;
+            this.selected = this.selected.filter(id => !ids.includes(id));
+        }
+    }">
+        <template x-for="id in selected"
+                  :key="id">
+            <input type="hidden"
+                   name="allowed_models[]"
+                   :value="id">
+        </template>
+        <div class="flex items-center gap-2 mb-2">
+            <input x-model="search"
+                   type="text"
+                   placeholder="{{ __('Search models…') }}"
+                   @keydown.enter.prevent
+                   class="flex-1 rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-1.5 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
+            <button type="button"
+                    @click="checkAll()"
+                    class="shrink-0 rounded-lg border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                {{ __('Select all') }}
+            </button>
+            <button type="button"
+                    @click="checkNone()"
+                    class="shrink-0 rounded-lg border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                {{ __('Select none') }}
+            </button>
+        </div>
+        <div class="h-52 overflow-y-auto rounded-lg border border-black/10 dark:border-white/10 p-1">
+            <template x-for="m in filtered"
+                      :key="m">
+                <label
+                       class="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 text-sm text-black dark:text-white">
+                    <input type="checkbox"
+                           :checked="isSelected(m)"
+                           @change="toggle(m)"
+                           class="rounded border-black/20 dark:border-white/20 text-black focus:ring-black/10 dark:focus:ring-white/15">
+                    <span x-text="m"
+                          class="truncate"></span>
+                </label>
+            </template>
+            <p x-show="filtered.length === 0"
+               class="py-4 text-center text-xs text-gray-400 dark:text-gray-500 italic">
+                {{ __('No models match your search.') }}
+            </p>
+        </div>
+    </div>
+    @error('allowed_models')
+    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+    @enderror
+</div>
+@endif
+
 <div class="px-5 py-4"
      x-data="{
         enabled: {{ old('is_enabled', $isEditing ? ($agent->is_enabled ? '1' : '0') : '1') !== '0' ? 'true' : 'false' }},

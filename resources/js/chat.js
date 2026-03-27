@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('send-btn');
     const cancelEditBtn = document.getElementById('cancel-edit-btn');
     const chatContainer = document.querySelector('[data-agent-config-id]');
+    const modelSelect = document.getElementById('model-select');
     const selectedAgentConfigId = chatContainer?.dataset.agentConfigId ?? null;
     let conversationId = null;
     let isStreaming = false;
@@ -299,6 +300,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const body = { prompt, agentConfigId: selectedAgentConfigId };
 
+            if (modelSelect && modelSelect.value) {
+                body.model = modelSelect.value;
+            }
+
             if (branchFrom) {
                 body.branchFrom = branchFrom;
             } else if (conversationId) {
@@ -469,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.dataset.conversationId = conv.id;
-            btn.className = 'w-full text-left px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded';
+            btn.className = 'cursor-pointer w-full text-left px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded';
             btn.innerHTML = `
                 <p class="text-xs font-medium text-black dark:text-white truncate">${escapeHtml(conv.title)}</p>
                 <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">${relativeTime(conv.updated_at)}</p>`;
