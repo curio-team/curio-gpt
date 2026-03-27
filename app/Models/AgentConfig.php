@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-#[Fillable(['name', 'description', 'instructions', 'created_by', 'allowed_groups', 'allowed_models', 'image_path', 'is_enabled', 'available_from', 'available_until'])]
+#[Fillable(['name', 'description', 'instructions', 'created_by', 'allowed_groups', 'allowed_models', 'image_path', 'is_enabled', 'available_from', 'available_until', 'monitoring_is_enabled', 'monitoring_instructions', 'monitoring_model'])]
 class AgentConfig extends Model
 {
     /** @use HasFactory<AgentConfigFactory> */
@@ -40,6 +40,7 @@ class AgentConfig extends Model
             'allowed_groups' => 'array',
             'allowed_models' => 'array',
             'is_enabled' => 'boolean',
+            'monitoring_is_enabled' => 'boolean',
         ];
     }
 
@@ -56,7 +57,7 @@ class AgentConfig extends Model
 
     protected function imageUrl(): Attribute
     {
-        return Attribute::get(fn() => $this->image_path
+        return Attribute::get(fn () => $this->image_path
             ? Storage::disk('public')->url($this->image_path)
             : null);
     }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Teacher\AgentConfigController;
 use App\Http\Controllers\Teacher\ChatController as TeacherChatController;
+use App\Http\Controllers\Teacher\ObservationController as TeacherObservationController;
 use App\Http\Controllers\Teacher\UsageController as TeacherUsageController;
 use App\Http\Middleware\EnsureUserIsTeacher;
 use Illuminate\Support\Facades\Route;
@@ -39,4 +40,7 @@ Route::middleware(['auth', EnsureUserIsTeacher::class])
         Route::get('chats/{conversation}', [TeacherChatController::class, 'show'])->name('chats.show');
 
         Route::get('usage', [TeacherUsageController::class, 'index'])->name('usage.index');
+
+        Route::get('observations', [TeacherObservationController::class, 'index'])->name('observations.index');
+        Route::get('observations/{id}', [TeacherObservationController::class, 'show'])->name('observations.show');
     });

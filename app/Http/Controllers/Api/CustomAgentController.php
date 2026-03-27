@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Ai\Agents\CustomAgent;
 use App\Http\Controllers\Controller;
+use App\Jobs\RunMonitoringAgent;
 use App\Models\AgentConfig;
 use App\Services\SdApiService;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,7 @@ class CustomAgentController extends Controller
         if ($request->user()->isTeacher()) {
             $agents = AgentConfig::orderBy('name')
                 ->get(['id', 'name', 'description', 'image_path'])
-                ->map(fn(AgentConfig $agent) => [
+                ->map(fn (AgentConfig $agent) => [
                     'id' => $agent->id,
                     'name' => $agent->name,
                     'description' => $agent->description,
@@ -49,7 +50,7 @@ class CustomAgentController extends Controller
                 return count(array_intersect($allowedGroups, $userGroupIds)) > 0;
             })
             ->values()
-            ->map(fn(AgentConfig $agent) => [
+            ->map(fn (AgentConfig $agent) => [
                 'id' => $agent->id,
                 'name' => $agent->name,
                 'description' => $agent->description,
@@ -121,27 +122,38 @@ class CustomAgentController extends Controller
             model: $selectedModel,
         );
 
-        return response()->stream(function () use ($stream, $agentConfigId) {
+        $userId = $request->user()->id;
+        $userPrompt = $validated['prompt'];
+
+        return response()->stream(function () use ($stream, $agentConfigId, $userId, $userPrompt) {
             $conversationId = null;
 
-            $stream->then(function ($response) use (&$conversationId, $agentConfigId) {
+            $stream->then(function ($response) use (&$conversationId, $agentConfigId, $userId, $userPrompt) {
                 $conversationId = $response->conversationId;
 
                 DB::table('agent_conversations')
                     ->where('id', $conversationId)
                     ->whereNull('agent_config_id')
                     ->update(['agent_config_id' => $agentConfigId]);
+
+                // Kick off monitoring agent after response so we have conversation id recorded.
+                RunMonitoringAgent::dispatch(
+                    agentConfigId: $agentConfigId,
+                    userId: $userId,
+                    conversationId: $conversationId,
+                    userMessage: $userPrompt,
+                )->afterResponse();
             });
 
             foreach ($stream as $event) {
-                yield 'data: ' . ((string) $event) . "\n\n";
+                yield 'data: '.((string) $event)."\n\n";
             }
 
             if ($conversationId) {
-                yield 'data: ' . json_encode([
+                yield 'data: '.json_encode([
                     'type' => 'conversation_id',
                     'conversation_id' => $conversationId,
-                ]) . "\n\n";
+                ])."\n\n";
             }
 
             yield "data: [DONE]\n\n";

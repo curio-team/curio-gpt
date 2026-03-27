@@ -27,6 +27,12 @@ if ($errors->has('allowed_models')) { $defaultTab = 'advanced'; }
                     class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors">
                 {{ __('Advanced') }}
             </button>
+            <button type="button"
+                    @click="tab = 'monitoring'"
+                    :class="tab === 'monitoring' ? 'bg-black/10 dark:bg-white/10 text-black dark:text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'"
+                    class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors">
+                {{ __('Monitoring') }}
+            </button>
         </div>
     </div>
 
@@ -108,6 +114,9 @@ if ($errors->has('allowed_models')) { $defaultTab = 'advanced'; }
             @enderror
         </div>
     </div>
+
+    <div class="px-5 pt-4"
+         x-show="false"></div>
 
     <div x-show="tab === 'access'"
          x-cloak>
@@ -333,5 +342,78 @@ if ($errors->has('allowed_models')) { $defaultTab = 'advanced'; }
             @enderror
         </div>
         @endif
+    </div>
+
+    <div x-show="tab === 'monitoring'"
+         x-cloak>
+        <div class="px-5 py-4"
+             x-data="{ monitoringEnabled: {{ old('monitoring_is_enabled', $isEditing ? ($agent->monitoring_is_enabled ? '1' : '0') : '0') !== '0' ? 'true' : 'false' }} }">
+
+            <p class="mb-4 block text-sm text-gray-700 dark:text-gray-400 mb-2">
+                {{
+                __('The monitoring function allows you to have the system observes the chat messages
+                the student sends to this agent. This way you can identify notable events, such as
+                smart questions, or moments where the student gets stuck.')
+                }}
+            </p>
+
+            <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
+                {{ __('Monitoring') }}
+            </p>
+
+            <input type="hidden"
+                   name="monitoring_is_enabled"
+                   :value="monitoringEnabled ? '1' : '0'">
+
+            <x-toggle model="monitoringEnabled"
+                      :on-label="__('Monitoring enabled')"
+                      :off-label="__('Monitoring disabled')"
+                      class="mb-4" />
+
+            <div x-show="monitoringEnabled">
+                <div class="mb-4">
+                    <label for="monitoring_instructions"
+                           class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {{ __('Monitoring Instructions') }}
+                    </label>
+                    <textarea id="monitoring_instructions"
+                              name="monitoring_instructions"
+                              rows="6"
+                              class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15 resize-y"
+                              placeholder="{{ __('Describe how the monitoring agent should observe chats and when to use the ReportObservation tool…') }}"
+                              maxlength="10000">{{ old('monitoring_instructions', $agent->monitoring_instructions ?? '') }}</textarea>
+                    @error('monitoring_instructions')
+                    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                @if (isset($models) && is_array($models) && count($models) > 0)
+                <div class="mb-2">
+                    <label for="monitoring_model"
+                           class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {{ __('Model for Monitoring Agent') }}
+                    </label>
+                    @php $currentMonitoringModel = old('monitoring_model', $isEditing ? ($agent->monitoring_model ?? '')
+                    : ''); @endphp
+                    <select id="monitoring_model"
+                            name="monitoring_model"
+                            class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
+                        <option value="">{{ __('Use system default') }}</option>
+                        @foreach ($models as $m)
+                        <option value="{{ $m['id'] }}"
+                                @if($currentMonitoringModel===$m['id'])
+                                selected
+                                @endif>
+                            {{ $m['id'] }} {{ $m['display'] }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('monitoring_model')
+                    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+                @endif
+            </div>
+        </div>
     </div>
 </div>

@@ -107,7 +107,7 @@
         <div class="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900">
             <div class="px-5 py-4 border-b border-black/5 dark:border-white/5">
                 <h2 class="text-sm font-medium text-black dark:text-white">{{ __('Overall Leaderboard') }}</h2>
-                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ __('Top students by total tokens used') }}
+                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ __('Top users by total tokens used') }}
                 </p>
             </div>
             <div class="divide-y divide-black/5 dark:divide-white/5">
@@ -132,7 +132,7 @@
         <div class="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900">
             <div class="px-5 py-4 border-b border-black/5 dark:border-white/5">
                 <h2 class="text-sm font-medium text-black dark:text-white">{{ __('Today') }}</h2>
-                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ __('Top students by tokens used today') }}
+                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ __('Top users by tokens used today') }}
                 </p>
             </div>
             <div class="divide-y divide-black/5 dark:divide-white/5">
@@ -158,7 +158,7 @@
             <div class="px-5 py-4 border-b border-black/5 dark:border-white/5">
                 <h2 class="text-sm font-medium text-black dark:text-white">{{ __('Last 14 Days (Total)') }}</h2>
                 <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ __('Total tokens used per day by all
-                    students') }}
+                    users') }}
                 </p>
             </div>
             <div class="px-5 py-4">

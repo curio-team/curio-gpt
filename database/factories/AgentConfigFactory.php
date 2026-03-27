@@ -27,6 +27,9 @@ class AgentConfigFactory extends Factory
             'is_enabled' => true,
             'available_from' => null,
             'available_until' => null,
+            'monitoring_is_enabled' => false,
+            'monitoring_instructions' => null,
+            'monitoring_model' => null,
         ];
     }
 

@@ -51,6 +51,9 @@ class AgentConfigController extends Controller
             'is_enabled' => ['required', 'boolean'],
             'available_from' => ['nullable', 'date_format:H:i'],
             'available_until' => ['nullable', 'date_format:H:i'],
+            'monitoring_is_enabled' => ['required', 'boolean'],
+            'monitoring_instructions' => ['nullable', 'string', 'max:10000'],
+            'monitoring_model' => ['nullable', 'string', 'max:100'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -91,6 +94,9 @@ class AgentConfigController extends Controller
             'is_enabled' => ['required', 'boolean'],
             'available_from' => ['nullable', 'date_format:H:i'],
             'available_until' => ['nullable', 'date_format:H:i'],
+            'monitoring_is_enabled' => ['required', 'boolean'],
+            'monitoring_instructions' => ['nullable', 'string', 'max:10000'],
+            'monitoring_model' => ['nullable', 'string', 'max:100'],
         ]);
 
         if ($request->hasFile('image')) {

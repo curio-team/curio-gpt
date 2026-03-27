@@ -23,6 +23,9 @@ return new class extends Migration
             $table->boolean('is_enabled')->default(true);
             $table->time('available_from')->nullable();
             $table->time('available_until')->nullable();
+            $table->boolean('monitoring_is_enabled')->default(false);
+            $table->text('monitoring_instructions')->nullable();
+            $table->string('monitoring_model', 100)->nullable();
             $table->timestamps();
         });
     }

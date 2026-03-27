@@ -111,6 +111,11 @@
            class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
             {{ __('→ View all student chats') }}
         </a>
+        <span class="mx-2 text-gray-400">·</span>
+        <a href="{{ route('teacher.observations.index') }}"
+           class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
+            {{ __('Agent Observations') }}
+        </a>
     </div>
 
 </div>
