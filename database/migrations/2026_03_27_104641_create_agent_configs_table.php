@@ -26,6 +26,7 @@ return new class extends Migration
             $table->boolean('monitoring_is_enabled')->default(false);
             $table->text('monitoring_instructions')->nullable();
             $table->string('monitoring_model', 100)->nullable();
+            $table->json('attachments')->nullable();
             $table->timestamps();
         });
     }

@@ -4,6 +4,7 @@ $defaultTab = 'general';
 if ($errors->has('allowed_groups') || $errors->has('available_from') || $errors->has('available_until') ||
 $errors->has('is_enabled')) { $defaultTab = 'access'; }
 if ($errors->has('allowed_models')) { $defaultTab = 'advanced'; }
+if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
 @endphp
 
 <div x-data="{ tab: '{{ $defaultTab }}' }">
@@ -33,6 +34,14 @@ if ($errors->has('allowed_models')) { $defaultTab = 'advanced'; }
                     class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors">
                 {{ __('Monitoring') }}
             </button>
+            @if ($isEditing)
+            <button type="button"
+                    @click="tab = 'attachments'"
+                    :class="tab === 'attachments' ? 'bg-black/10 dark:bg-white/10 text-black dark:text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'"
+                    class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors">
+                {{ __('Attachments') }}
+            </button>
+            @endif
         </div>
     </div>
 
@@ -416,4 +425,77 @@ if ($errors->has('allowed_models')) { $defaultTab = 'advanced'; }
             </div>
         </div>
     </div>
+
+    @if ($isEditing)
+    <div x-show="tab === 'attachments'"
+         x-cloak>
+        <div class="px-5 py-4">
+            <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
+                {{ __('Teacher Attachments') }}
+            </p>
+
+            <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
+                {{ __('Upload documents that the AI can reference. Files are stored privately and also uploaded to the
+                AI provider. Students’ chats with this agent will include these as attachments.') }}
+            </p>
+
+            <div class="mb-4 flex items-center gap-3">
+                <input id="attachment"
+                       name="attachment"
+                       type="file"
+                       form="agent-attachments-upload"
+                       class="flex-1 text-sm text-gray-700 dark:text-gray-300 file:mr-3 file:rounded-lg file:border-0 file:bg-black/5 dark:file:bg-white/10 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-black dark:file:text-white hover:file:opacity-80 transition-opacity"
+                       required>
+                <button type="submit"
+                        form="agent-attachments-upload"
+                        class="shrink-0 inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition-opacity">
+                    {{ __('Upload') }}
+                </button>
+            </div>
+            @error('attachment')
+            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+            @enderror
+
+            @php $attachments = $agent->attachments ?? []; @endphp
+            <div
+                 class="rounded-lg border border-black/10 dark:border-white/10 divide-y divide-black/5 dark:divide-white/5">
+                @forelse ($attachments as $att)
+                <div class="flex items-center justify-between px-3 py-2 text-sm">
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-black dark:text-white">{{ $att['name'] ?? basename($att['storage_path']
+                            ?? '') }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            {{ $att['mime'] ?? 'application/octet-stream' }}
+                            <span class="mx-1">·</span>
+                            @php $size = (int) ($att['size'] ?? 0); @endphp
+                            {{ $size > 0 ? number_format($size/1024, 1) . ' KB' : '' }}
+                            @if(!empty($att['uploaded_at']))
+                            <span class="mx-1">·</span>
+                            {{ \Illuminate\Support\Carbon::parse($att['uploaded_at'])->diffForHumans() }}
+                            @endif
+                        </p>
+                    </div>
+                    <div class="shrink-0 flex items-center gap-2">
+                        <a href="{{ route('teacher.agents.attachments.download', [$agent, $att['id'] ?? '']) }}"
+                           class="rounded-lg border border-black/10 dark:border-white/10 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{{
+                            __('Download') }}</a>
+                        <form method="POST"
+                              action="{{ route('teacher.agents.attachments.destroy', [$agent, $att['id'] ?? '']) }}"
+                              onsubmit="return confirm('{{ __('Delete this attachment?') }}')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="rounded-lg border border-black/10 dark:border-white/10 px-2 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors">{{
+                                __('Delete') }}</button>
+                        </form>
+                    </div>
+                </div>
+                @empty
+                <p class="px-3 py-6 text-center text-xs text-gray-400 dark:text-gray-500 italic">{{ __('No attachments
+                    uploaded yet.') }}</p>
+                @endforelse
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

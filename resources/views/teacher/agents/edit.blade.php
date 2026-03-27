@@ -34,3 +34,13 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<form id="agent-attachments-upload"
+      method="POST"
+      action="{{ route('teacher.agents.attachments.store', $agent) }}"
+      enctype="multipart/form-data"
+      class="hidden">
+    @csrf
+</form>
+@endpush

@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Laravel\Ai\Files\Document as AiDocument;
 
 class CustomAgentController extends Controller
 {
@@ -117,9 +118,17 @@ class CustomAgentController extends Controller
             // No restriction; use provided or fallback default
             $selectedModel = $selectedModel ?: 'gpt-4o';
         }
+        $attachments = collect($agentConfig->attachments ?? [])
+            ->pluck('provider_file_id')
+            ->filter()
+            ->map(fn (string $id) => AiDocument::fromId($id))
+            ->values()
+            ->all();
+
         $stream = $agent->stream(
             $validated['prompt'],
             model: $selectedModel,
+            attachments: $attachments,
         );
 
         $userId = $request->user()->id;

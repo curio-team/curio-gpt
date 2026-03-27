@@ -36,6 +36,13 @@ Route::middleware(['auth', EnsureUserIsTeacher::class])
             ->except(['show'])
             ->names('agents');
 
+        Route::post('agents/{agent}/attachments', [AgentConfigController::class, 'storeAttachment'])
+            ->name('agents.attachments.store');
+        Route::delete('agents/{agent}/attachments/{attachmentId}', [AgentConfigController::class, 'destroyAttachment'])
+            ->name('agents.attachments.destroy');
+        Route::get('agents/{agent}/attachments/{attachmentId}/download', [AgentConfigController::class, 'downloadAttachment'])
+            ->name('agents.attachments.download');
+
         Route::get('chats', [TeacherChatController::class, 'index'])->name('chats.index');
         Route::get('chats/{conversation}', [TeacherChatController::class, 'show'])->name('chats.show');
 

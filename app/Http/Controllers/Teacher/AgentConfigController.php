@@ -10,7 +10,9 @@ use App\Services\SdApiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Laravel\Ai\Files\Document as AiDocument;
 
 class AgentConfigController extends Controller
 {
@@ -125,6 +127,100 @@ class AgentConfigController extends Controller
 
         return redirect()->route('teacher.agents.index')
             ->with('success', 'Agent deleted.');
+    }
+
+    /**
+     * Upload an attachment for the given agent: store privately and upload to provider.
+     */
+    public function storeAttachment(Request $request, AgentConfig $agent): RedirectResponse
+    {
+        $validated = $request->validate([
+            'attachment' => ['required', 'file', 'max:20480'], // 20MB limit
+        ]);
+
+        try {
+            $file = $validated['attachment'];
+
+            // Store privately on local disk
+            $path = $file->store('agent-attachments/'.$agent->id, 'local');
+
+            // Upload to provider via Laravel AI SDK
+            $stored = AiDocument::fromStorage($path, disk: 'local')->put();
+
+            $attachments = $agent->attachments ?? [];
+            $attachments[] = [
+                'id' => (string) Str::uuid7(),
+                'name' => $file->getClientOriginalName(),
+                'mime' => $file->getClientMimeType(),
+                'size' => $file->getSize(),
+                'storage_path' => $path,
+                'provider' => 'openai',
+                'provider_file_id' => $stored->id ?? null,
+                'uploaded_at' => now()->toISOString(),
+            ];
+
+            $agent->update(['attachments' => $attachments]);
+
+            return back()->with('success', __('Attachment uploaded.'));
+        } catch (\Throwable $e) {
+            // Best-effort cleanup of local file if we created one but provider failed
+            if (isset($path)) {
+                Storage::disk('local')->delete($path);
+            }
+
+            return back()->withErrors(['attachment' => __('Upload failed: :msg', ['msg' => $e->getMessage()])]);
+        }
+    }
+
+    /**
+     * Download a previously uploaded attachment from private storage.
+     */
+    public function downloadAttachment(AgentConfig $agent, string $attachmentId)
+    {
+        $attachment = collect($agent->attachments ?? [])->firstWhere('id', $attachmentId);
+        abort_if(! $attachment, 404);
+
+        $path = $attachment['storage_path'] ?? null;
+        abort_if(! $path || ! Storage::disk('local')->exists($path), 404);
+
+        $filename = $attachment['name'] ?? basename($path);
+        $mime = $attachment['mime'] ?? null;
+
+        return Storage::disk('local')->download($path, $filename, array_filter([
+            'Content-Type' => $mime,
+        ]));
+    }
+
+    /**
+     * Delete an attachment from provider and private storage.
+     */
+    public function destroyAttachment(AgentConfig $agent, string $attachmentId): RedirectResponse
+    {
+        $attachments = collect($agent->attachments ?? []);
+        $attachment = $attachments->firstWhere('id', $attachmentId);
+
+        if (! $attachment) {
+            return back()->withErrors(['attachment' => __('Attachment not found.')]);
+        }
+
+        // Delete from provider (best-effort)
+        try {
+            if (! empty($attachment['provider_file_id'])) {
+                AiDocument::fromId($attachment['provider_file_id'])->delete();
+            }
+        } catch (\Throwable $e) {
+            // ignore provider deletion failures
+        }
+
+        // Delete local file
+        if (! empty($attachment['storage_path'])) {
+            Storage::disk('local')->delete($attachment['storage_path']);
+        }
+
+        $remaining = $attachments->reject(fn ($a) => ($a['id'] ?? null) === $attachmentId)->values()->all();
+        $agent->update(['attachments' => $remaining]);
+
+        return back()->with('success', __('Attachment deleted.'));
     }
 
     /**
