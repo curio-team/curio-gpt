@@ -136,7 +136,7 @@ return [
         ],
 
         'chats' => [
-            'title' => 'Studentchats',
+            'title' => 'Monitoring van studentchats',
             'view_usage' => 'Gebruik bekijken',
             'no_chats_yet' => 'Nog geen chats.',
             'show' => [

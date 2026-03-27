@@ -46,6 +46,11 @@
                     {{ __('app.nav.monitoring') }}
                 </a>
                 <span class="text-gray-300 dark:text-gray-700 select-none">·</span>
+                <a href="{{ route('teacher.observations.index') }}"
+                   class="text-sm text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
+                    {{ __('app.teacher.agents.observations') }}
+                </a>
+                <span class="text-gray-300 dark:text-gray-700 select-none">·</span>
                 @endif
                 <span class="text-sm text-gray-700 dark:text-gray-300">{{ auth()->user()->name }}</span>
                 @else

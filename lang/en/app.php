@@ -136,7 +136,7 @@ return [
         ],
 
         'chats' => [
-            'title' => 'Student Chats',
+            'title' => 'Monitoring Student Chats',
             'view_usage' => 'View Usage',
             'no_chats_yet' => 'No chats yet.',
             'show' => [

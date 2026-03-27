@@ -159,7 +159,7 @@ class AgentConfigController extends Controller
             $file = $validated['attachment'];
 
             // Store privately on local disk
-            $path = $file->store('agent-attachments/' . $agent->id, 'local');
+            $path = $file->store('agent-attachments/'.$agent->id, 'local');
 
             // Upload to provider via Laravel AI SDK
             $stored = AiDocument::fromStorage($path, disk: 'local')->put();
@@ -234,7 +234,7 @@ class AgentConfigController extends Controller
             Storage::disk('local')->delete($attachment['storage_path']);
         }
 
-        $remaining = $attachments->reject(fn($a) => ($a['id'] ?? null) === $attachmentId)->values()->all();
+        $remaining = $attachments->reject(fn ($a) => ($a['id'] ?? null) === $attachmentId)->values()->all();
         $agent->update(['attachments' => $remaining]);
 
         return back()->with('success', __('app.teacher.agents.flash.attachment_deleted'));
@@ -278,9 +278,9 @@ class AgentConfigController extends Controller
             $sortKey = $overall !== null ? (float) $overall : 999999.0;
 
             if ($overall !== null) {
-                $display = '  ' . __('app.teacher.agents.form.per_million_cost', ['price' => number_format($overall, 3)]);
+                $display = '  '.__('app.teacher.agents.form.per_million_cost', ['price' => number_format($overall, 3)]);
             } else {
-                $display = '  (' . __('app.teacher.agents.form.pricing_unknown') . ')';
+                $display = '  ('.__('app.teacher.agents.form.pricing_unknown').')';
             }
 
             return [
