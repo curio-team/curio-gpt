@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
-#[Fillable(['name', 'instructions', 'created_by'])]
+#[Fillable(['name', 'instructions', 'created_by', 'allowed_groups'])]
 class AgentConfig extends Model
 {
     /** @use HasFactory<AgentConfigFactory> */
@@ -28,6 +28,16 @@ class AgentConfig extends Model
      * @var bool
      */
     public $incrementing = false;
+
+    /**
+     * The attributes that should be cast to native types.
+     */
+    protected function casts(): array
+    {
+        return [
+            'allowed_groups' => 'array',
+        ];
+    }
 
     protected static function boot(): void
     {

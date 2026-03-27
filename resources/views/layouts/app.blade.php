@@ -65,6 +65,7 @@
     </main>
 
     @stack('scripts')
+    @livewireScriptConfig
 </body>
 
 </html>

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->string('name');
             $table->text('instructions');
+            $table->json('allowed_groups')->nullable();
             $table->timestamps();
         });
     }

@@ -224,11 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function setEditMode(active) {
         if (active) {
             sendBtn.innerHTML = SEND_ICON + ' Send edit';
-            promptEl.placeholder = 'Edit message\u2026';
+            promptEl.placeholder = 'Edit message…';
             cancelEditBtn?.style.removeProperty('display');
         } else {
             sendBtn.innerHTML = SEND_ICON + ' Send';
-            promptEl.placeholder = 'Message CurioGPT\u2026';
+            promptEl.placeholder = 'Message CurioGPT…';
             cancelEditBtn?.style.setProperty('display', 'none');
         }
     }

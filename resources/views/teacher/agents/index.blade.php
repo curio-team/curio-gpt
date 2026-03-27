@@ -33,6 +33,11 @@
       <div class="min-w-0 flex-1">
         <p class="text-sm font-medium text-black dark:text-white truncate">{{ $agent->name }}</p>
         <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{{ $agent->instructions }}</p>
+        @if (!empty($agent->allowed_groups))
+        <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
+          {{ __('Groups:') }} {{ collect($agent->allowed_groups)->implode(', ') }}
+        </p>
+        @endif
       </div>
       <div class="flex items-center gap-2 shrink-0">
         <a href="{{ route('teacher.agents.edit', $agent) }}"
