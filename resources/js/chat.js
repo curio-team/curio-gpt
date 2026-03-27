@@ -26,6 +26,7 @@ marked.use({ renderer, breaks: true, gfm: true });
 const COPY_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
 const CHECK_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
 const SEND_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>`;
+const EDIT_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
@@ -79,8 +80,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const emptyStateEl = document.getElementById('empty-state');
     const statusEl = document.getElementById('status');
     const sendBtn = document.getElementById('send-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
     let conversationId = null;
     let isStreaming = false;
+
+    /**
+     * Tracks all rendered messages in order: [{type, text, el}]
+     * Indices here correspond directly to DB row positions, enabling
+     * position-based branching when a message is edited.
+     */
+    let chatMessages = [];
+
+    /**
+     * When non-null, the user is editing a previous message.
+     * @type {{ branchFromConversationId: string, keepMessageCount: number, removed: Array<{type: string, text: string, el: Element}> } | null}
+     */
+    let pendingEdit = null;
 
     // ─ Send icon in submit button ─────────────────────────────────────────────
     if (sendBtn) {
@@ -104,9 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.requestSubmit();
             }
         }
+
+        if (e.key === 'Escape' && pendingEdit) {
+            cancelEdit();
+        }
     });
 
-    // ─ Copy buttons (event delegation) ───────────────────────────────────────
+    // ─ Copy / edit buttons (event delegation) ─────────────────────────────────
     messagesEl.addEventListener('click', (e) => {
         const codeBtn = e.target.closest('.copy-code-btn');
 
@@ -121,8 +140,68 @@ document.addEventListener('DOMContentLoaded', () => {
         if (msgBtn) {
             const text = decodeURIComponent(msgBtn.dataset.text);
             navigator.clipboard?.writeText(text).then(() => flashCopied(msgBtn));
+            return;
+        }
+
+        const editBtn = e.target.closest('.edit-msg-btn');
+
+        if (editBtn && !isStreaming) {
+            const index = parseInt(editBtn.dataset.index, 10);
+            startEdit(index);
         }
     });
+
+    // ─ Cancel edit button ─────────────────────────────────────────────────────
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', cancelEdit);
+    }
+
+    // ─ Edit state helpers ─────────────────────────────────────────────────────
+    function startEdit(index) {
+        const originalText = chatMessages[index]?.text ?? '';
+        const removed = chatMessages.splice(index);
+
+        pendingEdit = {
+            branchFromConversationId: conversationId,
+            keepMessageCount: index,
+            removed,
+        };
+
+        removed.forEach((m) => m.el.remove());
+
+        promptEl.value = originalText;
+        autoResize();
+        promptEl.focus();
+        setEditMode(true);
+    }
+
+    function cancelEdit() {
+        if (!pendingEdit) {
+            return;
+        }
+
+        pendingEdit.removed.forEach((m) => {
+            messagesEl.appendChild(m.el);
+            chatMessages.push(m);
+        });
+
+        pendingEdit = null;
+        promptEl.value = '';
+        autoResize();
+        setEditMode(false);
+    }
+
+    function setEditMode(active) {
+        if (active) {
+            sendBtn.innerHTML = SEND_ICON + ' Send edit';
+            promptEl.placeholder = 'Edit message\u2026';
+            cancelEditBtn?.style.removeProperty('display');
+        } else {
+            sendBtn.innerHTML = SEND_ICON + ' Send';
+            promptEl.placeholder = 'Message CurioGPT\u2026';
+            cancelEditBtn?.style.setProperty('display', 'none');
+        }
+    }
 
     // ─ DOM helpers ────────────────────────────────────────────────────────────
     function hideEmptyState() {
@@ -138,16 +217,22 @@ document.addEventListener('DOMContentLoaded', () => {
     function addUserMessage(text) {
         hideEmptyState();
 
+        const index = chatMessages.length;
         const el = document.createElement('div');
         el.className = 'flex justify-end mb-6 group';
         el.innerHTML = `
             <div class="flex flex-col items-end gap-1.5 max-w-[80%]">
                 <div class="rounded-2xl rounded-tr-sm bg-black dark:bg-white text-white dark:text-black px-4 py-2.5 text-sm whitespace-pre-wrap break-words leading-relaxed">${escapeHtml(text)}</div>
-                <button class="copy-msg-btn flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100" data-text="${encodeURIComponent(text)}" title="Copy message">${COPY_ICON} Copy</button>
+                <div class="flex items-center gap-2">
+                    <button class="edit-msg-btn flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100" data-index="${index}" title="Edit message">${EDIT_ICON} Edit</button>
+                    <button class="copy-msg-btn flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100" data-text="${encodeURIComponent(text)}" title="Copy message">${COPY_ICON} Copy</button>
+                </div>
             </div>`;
 
         messagesEl.appendChild(el);
         scrollBottom();
+
+        chatMessages.push({ type: 'user', text, el });
     }
 
     function createAssistantBubble() {
@@ -169,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesEl.appendChild(el);
 
         return {
+            el,
             contentEl: el.querySelector('.prose-chat'),
             copyBtn: el.querySelector('.copy-msg-btn'),
         };
@@ -201,12 +287,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         promptEl.value = '';
         promptEl.style.height = 'auto';
+
+        let branchFrom = null;
+
+        if (pendingEdit) {
+            branchFrom = {
+                conversationId: pendingEdit.branchFromConversationId,
+                keepMessageCount: pendingEdit.keepMessageCount,
+            };
+            pendingEdit = null;
+            setEditMode(false);
+        }
+
         addUserMessage(prompt);
         setLoading(true);
         statusEl.textContent = '';
 
         try {
             await ensureCsrfCookie();
+
+            const body = { prompt };
+
+            if (branchFrom) {
+                body.branchFrom = branchFrom;
+            } else if (conversationId) {
+                body.conversationId = conversationId;
+            }
 
             const res = await fetch('/api/agent', {
                 method: 'POST',
@@ -217,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') ?? '',
                 },
                 credentials: 'same-origin',
-                body: JSON.stringify({ prompt, conversationId }),
+                body: JSON.stringify(body),
             });
 
             if (!res.ok) {
@@ -230,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const { contentEl, copyBtn } = createAssistantBubble();
+            const { el: assistantEl, contentEl, copyBtn } = createAssistantBubble();
             const reader = res.body.getReader();
             const decoder = new TextDecoder();
             let buffer = '';
@@ -285,9 +391,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Final render and attach copy text
+            // Final render, attach copy text, and track the message
             contentEl.innerHTML = marked.parse(rawText);
             copyBtn.dataset.text = encodeURIComponent(rawText);
+            chatMessages.push({ type: 'assistant', text: rawText, el: assistantEl });
             scrollBottom();
         } catch (err) {
             addErrorMessage(err?.message ?? 'Network error');

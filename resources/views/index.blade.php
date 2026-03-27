@@ -52,11 +52,19 @@
                     <span class="text-xs text-gray-500 dark:text-gray-600 select-none">
                         {{ __('Enter to send') }} &middot; {{ __('Shift+Enter for new line') }}
                     </span>
-                    <button id="send-btn"
-                            type="submit"
-                            class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-80 disabled:opacity-30 transition-opacity">
-                        {{ __('Send') }}
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button id="cancel-edit-btn"
+                                type="button"
+                                style="display: none;"
+                                class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:opacity-80 transition-opacity">
+                            {{ __('Cancel edit') }}
+                        </button>
+                        <button id="send-btn"
+                                type="submit"
+                                class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-80 disabled:opacity-30 transition-opacity">
+                            {{ __('Send') }}
+                        </button>
+                    </div>
                 </div>
             </div>
             <p id="status"
