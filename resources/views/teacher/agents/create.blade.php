@@ -14,7 +14,8 @@
     </div>
 
     <form method="POST"
-          action="{{ route('teacher.agents.store') }}">
+          action="{{ route('teacher.agents.store') }}"
+          enctype="multipart/form-data">
         @csrf
 
         <div
@@ -34,6 +35,38 @@
                        required
                        maxlength="100">
                 @error('name')
+                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="px-5 py-4">
+                <label for="description"
+                       class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {{ __('Short Description') }}
+                </label>
+                <input id="description"
+                       name="description"
+                       type="text"
+                       value="{{ old('description') }}"
+                       class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15"
+                       placeholder="{{ __('e.g. Helps you study history topics') }}"
+                       maxlength="300">
+                @error('description')
+                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="px-5 py-4">
+                <label for="image"
+                       class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {{ __('Image') }}
+                </label>
+                <input id="image"
+                       name="image"
+                       type="file"
+                       accept="image/*"
+                       class="w-full text-sm text-gray-700 dark:text-gray-300 file:mr-3 file:rounded-lg file:border-0 file:bg-black/5 dark:file:bg-white/10 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-black dark:file:text-white hover:file:opacity-80 transition-opacity">
+                @error('image')
                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                 @enderror
             </div>

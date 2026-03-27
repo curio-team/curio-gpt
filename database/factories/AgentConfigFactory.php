@@ -20,6 +20,7 @@ class AgentConfigFactory extends Factory
     {
         return [
             'name' => $this->faker->words(3, true),
+            'description' => $this->faker->sentence(),
             'instructions' => $this->faker->paragraph(),
             'created_by' => User::factory(),
         ];

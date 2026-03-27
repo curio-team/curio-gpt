@@ -42,14 +42,20 @@ To get started with Curio GPT, follow these steps:
     php artisan key:generate
     ```
 
-6. Create the database and run migrations:
+6. Link the storage directory:
+
+    ```bash
+    php artisan storage:link
+    ```
+
+7. Create the database and run migrations:
 
     ```bash
     touch database/database.sqlite
     php artisan migrate
     ```
 
-7. Run the development server:
+8. Run the development server:
 
     ```bash
     composer run dev

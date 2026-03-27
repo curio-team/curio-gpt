@@ -2,90 +2,41 @@
 
 @section('title', __('Welcome') . ' - ' . config('app.name', 'CurioGPT'))
 
-@section('container-class', 'flex flex-col min-h-0 flex-1 w-full')
-
-@push('head')
-@vite(['resources/js/chat.js'])
-@endpush
-
 @section('content')
-<div class="flex flex-col min-h-0 flex-1 mx-auto w-full max-w-3xl">
+<div class="flex flex-col items-center justify-center flex-1 px-4 py-12">
 
-    {{-- Messages feed --}}
-    <div id="messages"
-         class="flex-1 overflow-y-auto px-4 py-6 scroll-smooth">
+    <h1 class="text-2xl font-semibold text-black dark:text-white mb-2">{{ __('Choose an agent') }}</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">{{ __('Select an agent to start chatting.') }}</p>
 
-        {{-- Empty / welcome state --}}
-        <div id="empty-state"
-             class="flex flex-col items-center justify-center h-full gap-5 text-center px-4 min-h-64">
-            <div class="w-14 h-14 rounded-full bg-black dark:bg-white flex items-center justify-center shadow-md">
-                <span class="text-white dark:text-black text-2xl font-bold select-none">C</span>
-            </div>
-            <div>
-                <h1 class="text-xl font-semibold text-black dark:text-white">{{ __('How can I help you?') }}</h1>
-                <p class="mt-1.5 text-sm text-gray-500 dark:text-gray-400">{{ __('Start a conversation with CurioGPT')
-                    }}</p>
-            </div>
-            @auth
-            <div id="agent-selector"
-                 class="w-full max-w-xs">
-                <label for="agent-select"
-                       class="sr-only">{{ __('Choose an agent') }}</label>
-                <select id="agent-select"
-                        class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
-                    <option value="">{{ __('Choose an agent…') }}</option>
-                </select>
-                <p id="agent-selector-error"
-                   class="mt-1.5 text-xs text-red-500 hidden">
-                    {{ __('Please select an agent before sending a message.') }}
-                </p>
-            </div>
-            @endauth
-            @guest
-            <p
-               class="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-full px-3 py-1.5">
-                {{ __('You must be logged in to chat with the agent.') }}
-            </p>
-            @endguest
-        </div>
+    @if ($agents->isEmpty())
+    <p class="text-sm text-gray-400 dark:text-gray-500">{{ __('No agents are available to you yet.') }}</p>
+    @else
+    <div class="flex flex-wrap justify-center gap-3 max-w-2xl w-full">
+        @foreach ($agents as $agent)
+        <a href="{{ route('chat.show', $agent) }}"
+           class="group flex flex-col items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 p-3 text-center hover:border-black/30 dark:hover:border-white/30 hover:shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15 w-80">
 
+            @if ($agent->image_url)
+            <img src="{{ $agent->image_url }}"
+                 alt="{{ $agent->name }}"
+                 class="w-12 h-12 rounded-lg object-cover shrink-0">
+            @else
+            <div class="w-12 h-12 rounded-lg bg-black/5 dark:bg-white/10 flex items-center justify-center shrink-0">
+                <span class="text-lg font-semibold text-black/40 dark:text-white/40 select-none">{{
+                    strtoupper(substr($agent->name, 0, 1)) }}</span>
+            </div>
+            @endif
+
+            <p class="text-xs font-medium text-black dark:text-white truncate w-full">{{ $agent->name }}</p>
+
+            @if ($agent->description)
+            <p class="text-xs text-gray-500 dark:text-gray-400 leading-snug">{{ $agent->description }}</p>
+            @endif
+
+        </a>
+        @endforeach
     </div>
-
-    {{-- Input area --}}
-    <div class="shrink-0 px-4 pb-4 pt-1">
-        <form id="chat-form">
-            <div
-                 class="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 shadow-sm focus-within:ring-2 focus-within:ring-black/10 dark:focus-within:ring-white/15 transition-shadow">
-                <label for="prompt"
-                       class="sr-only">{{ __('Message') }}</label>
-                <textarea id="prompt"
-                          name="prompt"
-                          rows="1"
-                          class="w-full resize-none bg-transparent px-4 pt-3.5 pb-2 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none"
-                          placeholder="{{ __('Message CurioGPT…') }}"></textarea>
-                <div class="flex items-center justify-between px-4 pb-3">
-                    <span class="text-xs text-gray-500 dark:text-gray-600 select-none">
-                        {{ __('Enter to send') }} &middot; {{ __('Shift+Enter for new line') }}
-                    </span>
-                    <div class="flex items-center gap-2">
-                        <button id="cancel-edit-btn"
-                                type="button"
-                                style="display: none;"
-                                class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:opacity-80 transition-opacity">
-                            {{ __('Cancel edit') }}
-                        </button>
-                        <button id="send-btn"
-                                type="submit"
-                                class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-80 disabled:opacity-30 transition-opacity">
-                            {{ __('Send') }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <p id="status"
-               class="mt-1.5 text-xs text-gray-400 dark:text-gray-500 text-center h-4"></p>
-        </form>
-    </div>
+    @endif
 
 </div>
 @endsection

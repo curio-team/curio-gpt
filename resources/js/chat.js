@@ -77,42 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const promptEl = document.getElementById('prompt');
     const messagesEl = document.getElementById('messages');
-    const emptyStateEl = document.getElementById('empty-state');
     const statusEl = document.getElementById('status');
     const sendBtn = document.getElementById('send-btn');
     const cancelEditBtn = document.getElementById('cancel-edit-btn');
-    const agentSelectEl = document.getElementById('agent-select');
-    const agentSelectorErrorEl = document.getElementById('agent-selector-error');
+    const chatContainer = document.querySelector('[data-agent-config-id]');
+    const selectedAgentConfigId = chatContainer?.dataset.agentConfigId ?? null;
     let conversationId = null;
-    let selectedAgentConfigId = null;
     let isStreaming = false;
-
-    // ─ Load agents ────────────────────────────────────────────────────────────
-    if (agentSelectEl) {
-        ensureCsrfCookie().then(() => {
-            fetch('/api/agents', {
-                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                credentials: 'same-origin',
-            })
-                .then((r) => r.json())
-                .then((agents) => {
-                    agents.forEach((agent) => {
-                        const opt = document.createElement('option');
-                        opt.value = agent.id;
-                        opt.textContent = agent.name;
-                        agentSelectEl.appendChild(opt);
-                    });
-                })
-                .catch(() => { });
-        });
-
-        agentSelectEl.addEventListener('change', () => {
-            selectedAgentConfigId = agentSelectEl.value || null;
-            if (agentSelectorErrorEl) {
-                agentSelectorErrorEl.classList.toggle('hidden', selectedAgentConfigId !== null);
-            }
-        });
-    }
 
     /**
      * Tracks all rendered messages in order: [{type, text, el}]
@@ -234,24 +205,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ─ DOM helpers ────────────────────────────────────────────────────────────
-    function hideEmptyState() {
-        if (emptyStateEl) {
-            emptyStateEl.style.display = 'none';
-        }
-
-        // Lock agent selection once the conversation starts
-        if (agentSelectEl && !agentSelectEl.disabled) {
-            agentSelectEl.disabled = true;
-        }
-    }
-
     function scrollBottom() {
         messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
     function addUserMessage(text) {
-        hideEmptyState();
-
         const index = chatMessages.length;
         const el = document.createElement('div');
         el.className = 'flex justify-end mb-6 group';
@@ -271,8 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createAssistantBubble() {
-        hideEmptyState();
-
         const el = document.createElement('div');
         el.className = 'flex gap-3 items-start mb-6 group';
         el.innerHTML = `
@@ -317,14 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const prompt = promptEl.value.trim();
 
         if (!prompt || isStreaming) {
-            return;
-        }
-
-        if (agentSelectEl && !selectedAgentConfigId) {
-            if (agentSelectorErrorEl) {
-                agentSelectorErrorEl.classList.remove('hidden');
-            }
-            agentSelectEl.focus();
             return;
         }
 

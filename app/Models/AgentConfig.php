@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Database\Factories\AgentConfigFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-#[Fillable(['name', 'instructions', 'created_by', 'allowed_groups'])]
+#[Fillable(['name', 'description', 'instructions', 'created_by', 'allowed_groups', 'image_path'])]
 class AgentConfig extends Model
 {
     /** @use HasFactory<AgentConfigFactory> */
@@ -48,6 +50,13 @@ class AgentConfig extends Model
                 $model->id = (string) Str::uuid7();
             }
         });
+    }
+
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::get(fn () => $this->image_path
+            ? Storage::disk('public')->url($this->image_path)
+            : null);
     }
 
     public function creator(): BelongsTo

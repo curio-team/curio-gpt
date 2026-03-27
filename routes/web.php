@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Teacher\AgentConfigController;
-use App\Http\Controllers\Teacher\ChatController;
+use App\Http\Controllers\Teacher\ChatController as TeacherChatController;
 use App\Http\Middleware\EnsureUserIsTeacher;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'index')->name('home');
+Route::middleware('auth')->group(function () {
+    Route::get('/', [ChatController::class, 'index'])->name('home');
+    Route::get('/chat/{agentConfig}', [ChatController::class, 'show'])->name('chat.show');
+});
 
 Route::get('/login', function () {
     return redirect('/sdclient/redirect');
@@ -30,6 +34,6 @@ Route::middleware(['auth', EnsureUserIsTeacher::class])
             ->except(['show'])
             ->names('agents');
 
-        Route::get('chats', [ChatController::class, 'index'])->name('chats.index');
-        Route::get('chats/{conversation}', [ChatController::class, 'show'])->name('chats.show');
+        Route::get('chats', [TeacherChatController::class, 'index'])->name('chats.index');
+        Route::get('chats/{conversation}', [TeacherChatController::class, 'show'])->name('chats.show');
     });

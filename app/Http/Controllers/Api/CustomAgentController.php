@@ -19,8 +19,13 @@ class CustomAgentController extends Controller
     {
         if ($request->user()->isTeacher()) {
             $agents = AgentConfig::orderBy('name')
-                ->get(['id', 'name'])
-                ->map(fn(AgentConfig $agent) => ['id' => $agent->id, 'name' => $agent->name]);
+                ->get(['id', 'name', 'description', 'image_path'])
+                ->map(fn (AgentConfig $agent) => [
+                    'id' => $agent->id,
+                    'name' => $agent->name,
+                    'description' => $agent->description,
+                    'image_url' => $agent->image_url,
+                ]);
 
             return response()->json($agents);
         }
@@ -29,7 +34,7 @@ class CustomAgentController extends Controller
         $userGroupIds = collect($personalInfo['groups'] ?? [])->pluck('id')->all();
 
         $agents = AgentConfig::orderBy('name')
-            ->get(['id', 'name', 'allowed_groups'])
+            ->get(['id', 'name', 'description', 'image_path', 'allowed_groups'])
             ->filter(function (AgentConfig $agent) use ($userGroupIds) {
                 $allowedGroups = $agent->allowed_groups;
 
@@ -40,7 +45,12 @@ class CustomAgentController extends Controller
                 return count(array_intersect($allowedGroups, $userGroupIds)) > 0;
             })
             ->values()
-            ->map(fn(AgentConfig $agent) => ['id' => $agent->id, 'name' => $agent->name]);
+            ->map(fn (AgentConfig $agent) => [
+                'id' => $agent->id,
+                'name' => $agent->name,
+                'description' => $agent->description,
+                'image_url' => $agent->image_url,
+            ]);
 
         return response()->json($agents);
     }
@@ -98,14 +108,14 @@ class CustomAgentController extends Controller
             });
 
             foreach ($stream as $event) {
-                yield 'data: ' . ((string) $event) . "\n\n";
+                yield 'data: '.((string) $event)."\n\n";
             }
 
             if ($conversationId) {
-                yield 'data: ' . json_encode([
+                yield 'data: '.json_encode([
                     'type' => 'conversation_id',
                     'conversation_id' => $conversationId,
-                ]) . "\n\n";
+                ])."\n\n";
             }
 
             yield "data: [DONE]\n\n";

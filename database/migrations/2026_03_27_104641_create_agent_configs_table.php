@@ -15,6 +15,8 @@ return new class extends Migration
             $table->string('id', 36)->primary();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->string('name');
+            $table->string('description', 300)->nullable();
+            $table->string('image_path')->nullable();
             $table->text('instructions');
             $table->json('allowed_groups')->nullable();
             $table->timestamps();

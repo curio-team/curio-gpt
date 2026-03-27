@@ -7,6 +7,7 @@ use App\Models\AgentConfig;
 use App\Services\SdApiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class AgentConfigController extends Controller
@@ -33,10 +34,18 @@ class AgentConfigController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
+            'description' => ['nullable', 'string', 'max:300'],
             'instructions' => ['required', 'string', 'max:10000'],
             'allowed_groups' => ['nullable', 'array'],
             'allowed_groups.*' => ['integer'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image_path'] = $request->file('image')->store('agent-images', 'public');
+        }
+
+        unset($validated['image']);
 
         AgentConfig::create([
             ...$validated,
@@ -58,10 +67,22 @@ class AgentConfigController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
+            'description' => ['nullable', 'string', 'max:300'],
             'instructions' => ['required', 'string', 'max:10000'],
             'allowed_groups' => ['nullable', 'array'],
             'allowed_groups.*' => ['integer'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($agent->image_path) {
+                Storage::disk('public')->delete($agent->image_path);
+            }
+
+            $validated['image_path'] = $request->file('image')->store('agent-images', 'public');
+        }
+
+        unset($validated['image']);
 
         $agent->update($validated);
 
@@ -71,6 +92,10 @@ class AgentConfigController extends Controller
 
     public function destroy(AgentConfig $agent): RedirectResponse
     {
+        if ($agent->image_path) {
+            Storage::disk('public')->delete($agent->image_path);
+        }
+
         $agent->delete();
 
         return redirect()->route('teacher.agents.index')
