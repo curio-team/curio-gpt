@@ -15,6 +15,9 @@ return [
     ],
 
     'common' => [
+        'copy' => 'Copy',
+        'copied' => 'Copied',
+        'copy_code' => 'Copy code',
         'model' => 'Model',
         'message' => 'Message',
         'history' => 'History',

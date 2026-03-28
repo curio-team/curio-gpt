@@ -22,6 +22,10 @@ class ConversationController extends Controller
             if (! $agentConfig->isCurrentlyAvailable()) {
                 abort(403);
             }
+
+            if ($agentConfig->history_is_disabled) {
+                abort(403);
+            }
         }
 
         $query = DB::table('agent_conversations')

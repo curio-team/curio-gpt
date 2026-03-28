@@ -4,28 +4,50 @@ import 'highlight.js/styles/atom-one-dark.min.css';
 
 // ─── Markdown Renderer ────────────────────────────────────────────────────────
 
+function cloneTemplate(id) {
+    const tpl = document.getElementById(id);
+    if (!tpl || !tpl.content || !tpl.content.firstElementChild) {
+        throw new Error(`Missing template: ${id}`);
+    }
+    return tpl.content.firstElementChild.cloneNode(true);
+}
+
 const renderer = {
     code({ text, lang }) {
         const validLang = lang && hljs.getLanguage(lang) ? lang : 'plaintext';
         const highlighted = hljs.highlight(text, { language: validLang }).value;
 
-        return `<div class="chat-code-block">
-            <div class="chat-code-header">
-                <span class="chat-code-lang">${lang || 'text'}</span>
-                <button class="copy-code-btn" data-code="${encodeURIComponent(text)}">${COPY_ICON} Copy</button>
-            </div>
-            <pre class="chat-code-pre"><code class="hljs language-${validLang}">${highlighted}</code></pre>
-        </div>`;
+        try {
+            const el = cloneTemplate('tpl-code-block');
+            const langEl = el.querySelector('[data-slot="lang"]');
+            const codeEl = el.querySelector('[data-slot="code"]');
+            const copyBtn = el.querySelector('.copy-code-btn');
+
+            if (langEl) { langEl.textContent = lang || 'text'; }
+            if (copyBtn) { copyBtn.dataset.code = encodeURIComponent(text); }
+            if (codeEl) {
+                codeEl.classList.add(`language-${validLang}`);
+                codeEl.innerHTML = highlighted;
+            }
+
+            return el.outerHTML;
+        } catch (e) {
+            // Fallback minimal HTML if template missing
+            return `<pre class="chat-code-pre"><code class="hljs language-${validLang}">${highlighted}</code></pre>`;
+        }
     },
 };
 
 marked.use({ renderer, breaks: true, gfm: true });
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
-
-const COPY_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
-const CHECK_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
-const EDIT_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+// ─── Icons & labels from templates ───────────────────────────────────────────
+function getCheckIconHtml() {
+    return document.getElementById('tpl-icon-check')?.innerHTML?.trim() ?? '✓';
+}
+function getCopiedText() {
+    const t = document.getElementById('tpl-copied-text');
+    return (t?.content?.textContent ?? 'Copied!').trim();
+}
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
@@ -57,7 +79,7 @@ async function ensureCsrfCookie() {
 
 function flashCopied(btn) {
     const orig = btn.innerHTML;
-    btn.innerHTML = CHECK_ICON + ' Copied!';
+    btn.innerHTML = getCheckIconHtml() + ' ' + getCopiedText();
     btn.disabled = true;
     setTimeout(() => {
         btn.innerHTML = orig;
@@ -82,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatContainer = document.querySelector('[data-agent-config-id]');
     const modelSelect = document.getElementById('model-select');
     const selectedAgentConfigId = chatContainer?.dataset.agentConfigId ?? null;
-    const historyDisabled = chatContainer?.dataset.historyDisabled === '1';
     let conversationId = null;
     let isStreaming = false;
 
@@ -203,16 +224,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addUserMessage(text) {
         const index = chatMessages.length;
-        const el = document.createElement('div');
-        el.className = 'flex justify-end mb-6 group';
-        el.innerHTML = `
-            <div class="flex flex-col items-end gap-1.5 max-w-[80%]">
-                <div class="rounded-2xl rounded-tr-sm bg-black dark:bg-white text-white dark:text-black px-4 py-2.5 text-sm whitespace-pre-wrap break-words leading-relaxed">${escapeHtml(text)}</div>
-                <div class="flex items-center gap-2">
-                    <button class="edit-msg-btn flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100" data-index="${index}" title="Edit message">${EDIT_ICON} Edit</button>
-                    <button class="copy-msg-btn flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100" data-text="${encodeURIComponent(text)}" title="Copy message">${COPY_ICON} Copy</button>
-                </div>
-            </div>`;
+        const el = cloneTemplate('tpl-user-message');
+
+        const textEl = el.querySelector('[data-slot="text"]');
+        const editBtn = el.querySelector('.edit-msg-btn');
+        const copyBtn = el.querySelector('.copy-msg-btn');
+
+        if (textEl) { textEl.textContent = text; }
+        if (editBtn) { editBtn.dataset.index = String(index); }
+        if (copyBtn) { copyBtn.dataset.text = encodeURIComponent(text); }
 
         messagesEl.appendChild(el);
         scrollBottom();
@@ -221,32 +241,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createAssistantBubble() {
-        const el = document.createElement('div');
-        el.className = 'flex gap-3 items-start mb-6 group';
-        el.innerHTML = `
-            <div class="shrink-0 mt-0.5 w-7 h-7 rounded-full bg-black dark:bg-white flex items-center justify-center" aria-hidden="true">
-                <span class="text-white dark:text-black font-semibold text-xs select-none">C</span>
-            </div>
-            <div class="flex-1 min-w-0">
-                <div class="prose-chat text-sm text-black dark:text-white leading-relaxed"></div>
-                <div class="mt-2 h-5">
-                    <button class="copy-msg-btn flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100" data-text="" title="Copy message">${COPY_ICON} Copy</button>
-                </div>
-            </div>`;
-
+        const el = cloneTemplate('tpl-assistant-message');
         messagesEl.appendChild(el);
-
         return {
             el,
-            contentEl: el.querySelector('.prose-chat'),
+            contentEl: el.querySelector('[data-slot="content"]') || el.querySelector('.prose-chat'),
             copyBtn: el.querySelector('.copy-msg-btn'),
         };
     }
 
     function addErrorMessage(text) {
-        const el = document.createElement('div');
-        el.className = 'flex justify-center mb-4';
-        el.innerHTML = `<div class="text-xs text-red-500 dark:text-red-400 px-3 py-1.5 rounded-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">${escapeHtml(text)}</div>`;
+        const el = cloneTemplate('tpl-error-message');
+        const textEl = el.querySelector('[data-slot="text"]');
+        if (textEl) { textEl.textContent = text; }
         messagesEl.appendChild(el);
         scrollBottom();
     }
@@ -370,11 +377,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 requestAnimationFrame(renderChunk);
                             }
                         } else if (event.type === 'conversation_id') {
-                            if (!historyDisabled) {
-                                conversationId = event.conversation_id;
-                                loadConversations();
-                                setActiveConversation(conversationId);
-                            }
+                            conversationId = event.conversation_id;
+                            loadConversations();
+                            setActiveConversation(conversationId);
                         }
                     } catch {
                         // ignore malformed events
@@ -427,7 +432,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadConversations() {
-        if (!conversationsList || !selectedAgentConfigId) { return; }
+        if (!conversationsList || !selectedAgentConfigId) {
+            return;
+        }
 
         try {
             const res = await fetch(`/api/conversations?agentConfigId=${encodeURIComponent(selectedAgentConfigId)}`, {
@@ -435,7 +442,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 credentials: 'same-origin',
             });
 
-            if (!res.ok) { return; }
+            if (!res.ok) {
+                return;
+            }
 
             const conversations = await res.json();
 
@@ -464,13 +473,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         conversations.forEach((conv) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
+            const btn = cloneTemplate('tpl-conversation-item');
             btn.dataset.conversationId = conv.id;
-            btn.className = 'cursor-pointer w-full text-left px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded';
-            btn.innerHTML = `
-                <p class="text-xs font-medium text-black dark:text-white truncate">${escapeHtml(conv.title)}</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">${relativeTime(conv.updated_at)}</p>`;
+            const titleEl = btn.querySelector('[data-slot="title"]');
+            const timeEl = btn.querySelector('[data-slot="time"]');
+            if (titleEl) { titleEl.textContent = conv.title; }
+            if (timeEl) { timeEl.textContent = relativeTime(conv.updated_at); }
             btn.addEventListener('click', () => selectConversation(conv.id));
             conversationsList.appendChild(btn);
         });
@@ -529,7 +537,5 @@ document.addEventListener('DOMContentLoaded', () => {
         newChatBtn.addEventListener('click', startNewChat);
     }
 
-    if (!historyDisabled) {
-        loadConversations();
-    }
+    loadConversations();
 });
