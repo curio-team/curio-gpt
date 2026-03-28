@@ -37,7 +37,7 @@
             @php
                 $userBubble = 'max-w-[80%] rounded-2xl rounded-tr-sm bg-black dark:bg-white text-white dark:text-black px-4 py-2.5
     text-sm whitespace-pre-wrap break-words leading-relaxed';
-                $assistantBubble = 'flex-1 min-w-0';
+                $assistantBubble = 'flex-1 min-w-0 prose-chat text-sm text-black dark:text-white leading-relaxed';
             @endphp
             <div class="space-y-4">
                 @foreach ($messages as $message)
@@ -51,10 +51,7 @@
                                 aria-hidden="true">
                                 <span class="text-white dark:text-black font-semibold text-xs select-none">C</span>
                             </div>
-                            <div class="{{ $assistantBubble }}">
-                                <div class="prose-chat text-sm text-black dark:text-white leading-relaxed" data-md-source>
-                                    {{ $message->content }}</div>
-                            </div>
+                            <div class="{{ $assistantBubble }}" data-md-source>{{ $message->content }}</div>
                         </div>
                     @endif
                 @endforeach
