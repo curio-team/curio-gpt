@@ -38,4 +38,12 @@
         enctype="multipart/form-data" class="hidden">
         @csrf
     </form>
+    @php $__attachments = $agent->attachments ?? []; @endphp
+    @foreach ($__attachments as $__att)
+        <form id="agent-attachment-delete-{{ $__att['id'] ?? '' }}" method="POST"
+            action="{{ route('teacher.agents.attachments.destroy', [$agent, $__att['id'] ?? '']) }}" class="hidden">
+            @csrf
+            @method('DELETE')
+        </form>
+    @endforeach
 @endpush

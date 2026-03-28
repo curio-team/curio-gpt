@@ -417,14 +417,10 @@
                             <div class="shrink-0 flex items-center gap-2">
                                 <a href="{{ route('teacher.agents.attachments.download', [$agent, $att['id'] ?? '']) }}"
                                     class="rounded-lg border border-black/10 dark:border-white/10 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{{ __('app.common.download') }}</a>
-                                <form method="POST"
-                                    action="{{ route('teacher.agents.attachments.destroy', [$agent, $att['id'] ?? '']) }}"
-                                    onsubmit="return confirm('{{ __('app.teacher.agents.form.delete_attachment_confirm') }}')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="rounded-lg border border-black/10 dark:border-white/10 px-2 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors">{{ __('app.common.delete') }}</button>
-                                </form>
+                                <button type="submit"
+                                    form="agent-attachment-delete-{{ $att['id'] ?? '' }}"
+                                    onclick="return confirm('{{ __('app.teacher.agents.form.delete_attachment_confirm') }}')"
+                                    class="rounded-lg border border-black/10 dark:border-white/10 px-2 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors">{{ __('app.common.delete') }}</button>
                             </div>
                         </div>
                     @empty
