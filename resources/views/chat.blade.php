@@ -11,8 +11,9 @@
 @section('content')
 
 {{-- Conversation history sidebar --}}
+@unless($agentConfig->history_is_disabled)
 <aside id="conversations-sidebar"
-       class="hidden md:flex flex-col w-60 shrink-0 border-r border-black/10 dark:border-white/10 overflow-hidden">
+    class="hidden md:flex flex-col w-60 shrink-0 border-r border-black/10 dark:border-white/10 overflow-hidden">
     <div class="flex items-center justify-between px-4 py-3 border-b border-black/10 dark:border-white/10 shrink-0">
         <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide select-none">{{
             __('app.common.history') }}</span>
@@ -27,11 +28,13 @@
          class="flex-1 overflow-y-auto py-1">
     </div>
 </aside>
+@endunless
 
 {{-- Chat pane --}}
 <div class="flex flex-col min-h-0 flex-1 overflow-hidden">
-    <div class="flex flex-col min-h-0 flex-1 mx-auto w-full max-w-3xl"
-         data-agent-config-id="{{ $agentConfig->id }}">
+        <div class="flex flex-col min-h-0 flex-1 mx-auto w-full max-w-3xl"
+            data-agent-config-id="{{ $agentConfig->id }}"
+            data-history-disabled="{{ $agentConfig->history_is_disabled ? '1' : '0' }}">
         @if (!empty($agentConfig->allowed_models))
         <div class="mt-4 flex self-end gap-4 items-center justify-between">
             <label for="model-select"

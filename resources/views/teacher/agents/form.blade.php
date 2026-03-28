@@ -188,6 +188,24 @@ if ($errors->has('attachment')) { $defaultTab = 'attachments'; }
             </div>
         </div>
 
+        <div class="px-5 py-4"
+             x-data="{ historyDisabled: {{ old('history_is_disabled', $isEditing ? ($agent->history_is_disabled ? '1' : '0') : '0') !== '0' ? 'true' : 'false' }} }">
+            <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
+                {{ __('app.teacher.agents.form.conversation_history') }}
+            </p>
+
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ __('app.teacher.agents.form.conversation_history_help') }}</p>
+
+            <input type="hidden"
+                   name="history_is_disabled"
+                   :value="historyDisabled ? '1' : '0'">
+
+            <x-toggle model="historyDisabled"
+                      :on-label="__('app.teacher.agents.form.history_disabled')"
+                      :off-label="__('app.teacher.agents.form.history_enabled')"
+                      class="mb-1" />
+        </div>
+
         <div class="px-5 py-4">
             <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {{ __('app.teacher.agents.form.groups_heading') }}

@@ -104,6 +104,11 @@ return [
                 'until' => 'Tot',
                 'current_server_time' => 'Huidige servertijd:',
 
+                'conversation_history' => 'Conversatielijst',
+                'conversation_history_help' => 'Uitschakelen om te voorkomen dat studenten de vorige chats voor deze agent kunnen zien of terugkeren. Bestaande geschiedenis blijft tot je het intrekt.',
+                'history_enabled' => 'Geschiedenis ingeschakeld',
+                'history_disabled' => 'Geschiedenis uitgeschakeld',
+
                 'groups_heading' => 'Toegankelijk voor groepen',
                 'groups_help' => 'Selecteer welke groepen toegang hebben tot deze agent. Docenten hebben altijd toegang.',
                 'search_groups' => 'Groepen zoeken…',

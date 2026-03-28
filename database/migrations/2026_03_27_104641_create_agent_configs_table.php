@@ -21,6 +21,7 @@ return new class extends Migration
             $table->json('allowed_groups')->nullable();
             $table->json('allowed_models')->nullable();
             $table->boolean('is_enabled')->default(true);
+            $table->boolean('history_is_disabled')->default(false);
             $table->time('available_from')->nullable();
             $table->time('available_until')->nullable();
             $table->boolean('monitoring_is_enabled')->default(false);

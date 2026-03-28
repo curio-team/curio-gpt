@@ -104,6 +104,11 @@ return [
                 'until' => 'Until',
                 'current_server_time' => 'Current server time:',
 
+                'conversation_history' => 'Conversation history',
+                'conversation_history_help' => 'Disable to prevent students from seeing or returning to previous chats for this agent. Existing history remains until you revoke it.',
+                'history_enabled' => 'History enabled',
+                'history_disabled' => 'History disabled',
+
                 'groups_heading' => 'Accessible to Groups',
                 'groups_help' => 'Select which groups can access this agent. Teachers always have access.',
                 'search_groups' => 'Search groups…',

@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatContainer = document.querySelector('[data-agent-config-id]');
     const modelSelect = document.getElementById('model-select');
     const selectedAgentConfigId = chatContainer?.dataset.agentConfigId ?? null;
+    const historyDisabled = chatContainer?.dataset.historyDisabled === '1';
     let conversationId = null;
     let isStreaming = false;
 
@@ -369,9 +370,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 requestAnimationFrame(renderChunk);
                             }
                         } else if (event.type === 'conversation_id') {
-                            conversationId = event.conversation_id;
-                            loadConversations();
-                            setActiveConversation(conversationId);
+                            if (!historyDisabled) {
+                                conversationId = event.conversation_id;
+                                loadConversations();
+                                setActiveConversation(conversationId);
+                            }
                         }
                     } catch {
                         // ignore malformed events
@@ -526,5 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
         newChatBtn.addEventListener('click', startNewChat);
     }
 
-    loadConversations();
+    if (!historyDisabled) {
+        loadConversations();
+    }
 });
