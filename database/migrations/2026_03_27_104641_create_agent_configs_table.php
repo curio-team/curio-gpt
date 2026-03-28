@@ -20,6 +20,8 @@ return new class extends Migration
             $table->text('instructions');
             $table->json('allowed_groups')->nullable();
             $table->json('allowed_models')->nullable();
+            $table->boolean('file_uploads_allowed')->default(false);
+            $table->unsignedTinyInteger('file_uploads_limit')->default(5);
             $table->boolean('is_enabled')->default(true);
             $table->boolean('history_is_disabled')->default(false);
             $table->time('available_from')->nullable();

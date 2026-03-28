@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
                 'monitoring_is_enabled' => true,
                 'monitoring_instructions' => 'Wanneer de student meermaals niet goed de basis van Software Development begrijpt, of wanneer de student gefrustreerd raakt, rapporteer dit dan als een observatie.',
                 'monitoring_model' => 'gpt-4o-mini',
+                'file_uploads_allowed' => true,
+                'file_uploads_limit' => 5,
             ],
             [
                 'name' => 'Nederlandse Taalhulp',

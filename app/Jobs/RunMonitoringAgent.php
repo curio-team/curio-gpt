@@ -19,6 +19,7 @@ class RunMonitoringAgent implements ShouldQueue
         public string $userId,
         public string $conversationId,
         public string $userMessage,
+        public array $uploadedFiles = [],
     ) {}
 
     public function handle(): void
@@ -39,11 +40,19 @@ Een bericht is opmerkelijk volgens deze beschrijving van de docent:
 '''
 PROMPT;
 
+        $filesSection = '';
+        if (! empty($this->uploadedFiles)) {
+            $list = collect($this->uploadedFiles)->map(fn ($n) => "- {$n}")->implode("\n");
+            $filesSection = "\nBijgevoegde bestanden:\n{$list}\n";
+        }
+
         $prompt = <<<PROMPT
 Student bericht:
 '''
 {$this->userMessage}
 '''
+
+{$filesSection}
 PROMPT;
 
         $agent = new MonitoringAgent($instructions, $config->id, $this->userId, $this->conversationId);

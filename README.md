@@ -60,3 +60,28 @@ To get started with Curio GPT, follow these steps:
     ```
 
 Access the application at `http://127.0.0.1:8000` and start configuring your AI assistant!
+
+## Additional Configuration
+
+To ensure file uploads work correctly, you may need to setup a CA bundle for HTTPS verification in local development:
+
+1. Download a `cacert.pem` file from a trusted source (e.g., <https://curl.se/ca/cacert.pem>).
+
+2. Save the `cacert.pem` file to a secure location on your machine (e.g., `C:\laragon\cacert.pem`).
+
+3. Modify your `php.ini` file to include the path to the CA bundle:
+
+    ```ini
+    [curl]
+    curl.cainfo = "C:\laragon\cacert.pem"
+
+    [openssl]
+    openssl.cafile="C:\laragon\cacert.pem"
+    ```
+
+4. Ensure the `openssl` and `curl` extensions are enabled in your `php.ini` file:
+
+    ```ini
+    extension=openssl
+    extension=curl
+    ```

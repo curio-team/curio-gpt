@@ -15,9 +15,11 @@ return [
     ],
 
     'common' => [
+        'add' => 'Add',
         'copy' => 'Copy',
         'copied' => 'Copied',
         'copy_code' => 'Copy code',
+        'attach_files' => 'Attach files',
         'model' => 'Model',
         'message' => 'Message',
         'history' => 'History',
@@ -119,6 +121,13 @@ return [
                 'select_none' => 'Select none',
                 'no_groups_match' => 'No groups match your search.',
                 'no_groups_available' => 'No groups available.',
+
+                'uploads_heading' => 'File Uploads',
+                'uploads_help' => 'Allow students to attach files to their chat messages. Files are stored privately and uploaded to the AI provider so the AI can use them.',
+                'uploads_enabled' => 'File uploads allowed',
+                'uploads_disabled' => 'File uploads not allowed',
+                'uploads_limit' => 'Per-conversation file limit',
+                'uploads_limit_help' => 'Maximum number of files that can be attached across a single conversation.',
 
                 'student_selectable_models' => 'Student-Selectable Models',
                 'student_selectable_models_help' => 'Choose which OpenAI models students can pick for this assistant. Sorted by overall estimated price per 1M tokens (cheapest first). Leave empty to always use the system default.',

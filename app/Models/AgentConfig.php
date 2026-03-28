@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-#[Fillable(['name', 'description', 'instructions', 'created_by', 'allowed_groups', 'allowed_models', 'image_path', 'is_enabled', 'history_is_disabled', 'available_from', 'available_until', 'monitoring_is_enabled', 'monitoring_instructions', 'monitoring_model', 'attachments'])]
+#[Fillable(['name', 'description', 'instructions', 'created_by', 'allowed_groups', 'allowed_models', 'image_path', 'file_uploads_allowed', 'file_uploads_limit', 'is_enabled', 'history_is_disabled', 'available_from', 'available_until', 'monitoring_is_enabled', 'monitoring_instructions', 'monitoring_model', 'attachments'])]
 class AgentConfig extends Model
 {
     /** @use HasFactory<AgentConfigFactory> */
@@ -40,11 +40,23 @@ class AgentConfig extends Model
             'allowed_groups' => 'array',
             'allowed_models' => 'array',
             'attachments' => 'array',
+            'file_uploads_allowed' => 'boolean',
+            'file_uploads_limit' => 'integer',
             'is_enabled' => 'boolean',
             'history_is_disabled' => 'boolean',
             'monitoring_is_enabled' => 'boolean',
         ];
     }
+
+    /**
+     * Default attribute values mirroring migration defaults.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'file_uploads_allowed' => false,
+        'file_uploads_limit' => 5,
+    ];
 
     protected static function boot(): void
     {

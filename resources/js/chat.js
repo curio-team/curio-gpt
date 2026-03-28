@@ -104,8 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatContainer = document.querySelector('[data-agent-config-id]');
     const modelSelect = document.getElementById('model-select');
     const selectedAgentConfigId = chatContainer?.dataset.agentConfigId ?? null;
+    const uploadsAllowed = (chatContainer?.dataset.fileUploadsAllowed ?? '0') === '1';
+    const uploadsLimit = parseInt(chatContainer?.dataset.fileUploadsLimit ?? '5', 10) || 5;
+    const attachBtn = document.getElementById('attach-btn');
+    const fileInput = document.getElementById('file-input');
     let conversationId = null;
     let isStreaming = false;
+    let selectedFiles = [];
 
     /**
      * Tracks all rendered messages in order: [{type, text, el}]
@@ -265,6 +270,37 @@ document.addEventListener('DOMContentLoaded', () => {
         promptEl.focus();
     }
 
+    // ─ File uploads ───────────────────────────────────────────────────────────
+    function refreshAttachUi() {
+        if (!attachBtn) { return; }
+        if (uploadsAllowed) {
+            attachBtn.style.removeProperty('display');
+        } else {
+            attachBtn.style.setProperty('display', 'none');
+        }
+    }
+
+    refreshAttachUi();
+
+    if (attachBtn && fileInput) {
+        attachBtn.addEventListener('click', () => {
+            if (isStreaming) { return; }
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (!fileInput.files) { return; }
+            const picked = Array.from(fileInput.files);
+            // Limit number of files per message to uploadsLimit; server enforces per-conversation
+            selectedFiles = picked.slice(0, uploadsLimit);
+            if (selectedFiles.length < picked.length) {
+                statusEl.textContent = `Only ${uploadsLimit} files allowed at once.`;
+            } else {
+                statusEl.textContent = selectedFiles.length > 0 ? `${selectedFiles.length} file(s) selected.` : '';
+            }
+        });
+    }
+
     // ─ Submit ──────────────────────────────────────────────────────────────────
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -308,17 +344,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 body.conversationId = conversationId;
             }
 
-            const res = await fetch('/api/agent', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') ?? '',
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify(body),
-            });
+            let res;
+            if (uploadsAllowed && selectedFiles.length > 0) {
+                const form = new FormData();
+                form.set('prompt', body.prompt);
+                form.set('agentConfigId', body.agentConfigId ?? '');
+                if (body.model) { form.set('model', body.model); }
+                if (body.conversationId) { form.set('conversationId', body.conversationId); }
+                if (body.branchFrom) {
+                    form.set('branchFrom[conversationId]', body.branchFrom.conversationId);
+                    form.set('branchFrom[keepMessageCount]', String(body.branchFrom.keepMessageCount));
+                }
+                selectedFiles.forEach((f) => form.append('files[]', f));
+
+                res = await fetch('/api/agent', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') ?? '',
+                    },
+                    credentials: 'same-origin',
+                    body: form,
+                });
+            } else {
+                res = await fetch('/api/agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') ?? '',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(body),
+                });
+            }
 
             if (!res.ok) {
                 if (res.status === 401) {
@@ -396,6 +457,12 @@ document.addEventListener('DOMContentLoaded', () => {
             addErrorMessage(err?.message ?? 'Network error');
         } finally {
             setLoading(false);
+            // Reset selection after send attempt
+            if (fileInput) { fileInput.value = ''; }
+            selectedFiles = [];
+            if (statusEl.textContent?.includes('file')) {
+                statusEl.textContent = '';
+            }
         }
     });
 

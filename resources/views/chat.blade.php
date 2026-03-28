@@ -30,7 +30,9 @@
     {{-- Chat pane --}}
     <div class="flex flex-col min-h-0 flex-1 overflow-hidden">
         <div class="flex flex-col min-h-0 flex-1 mx-auto w-full max-w-3xl" data-agent-config-id="{{ $agentConfig->id }}"
-            data-history-disabled="{{ $agentConfig->history_is_disabled ? '1' : '0' }}">
+            data-history-disabled="{{ $agentConfig->history_is_disabled ? '1' : '0' }}"
+            data-file-uploads-allowed="{{ $agentConfig->file_uploads_allowed ? '1' : '0' }}"
+            data-file-uploads-limit="{{ (int) ($agentConfig->file_uploads_limit ?? 5) }}">
             @if (!empty($agentConfig->allowed_models))
                 <div class="mt-4 flex self-end gap-4 items-center justify-between">
                     <label for="model-select"
@@ -62,12 +64,25 @@
                                 {{ __('app.common.enter_to_send') }} &middot; {{ __('app.common.shift_enter_new_line') }}
                             </span>
                             <div class="flex items-center gap-2">
+                                <input id="file-input" name="files[]" type="file" class="hidden" multiple>
+                                <button id="attach-btn" type="button"
+                                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:opacity-80 transition-opacity"
+                                    title="{{ __('app.common.attach_files') }}"
+                                    aria-label="{{ __('app.common.attach_files') }}" style="display: none;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M12 5v14" />
+                                        <path d="M5 12h14" />
+                                    </svg>
+                                    <span>{{ __('app.common.add') }}</span>
+                                </button>
                                 <button id="cancel-edit-btn" type="button" style="display: none;"
-                                    class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:opacity-80 transition-opacity">
+                                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:opacity-80 transition-opacity">
                                     {{ __('app.common.cancel_edit') }}
                                 </button>
                                 <button id="send-btn" type="submit"
-                                    class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-80 disabled:opacity-30 transition-opacity">
+                                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-80 disabled:opacity-30 transition-opacity">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

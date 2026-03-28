@@ -121,8 +121,12 @@
             hasTimeWindow: {{ old('available_from', $isEditing ? $agent->available_from ?? '' : '') !== '' || old('available_until', $isEditing ? $agent->available_until ?? '' : '') !== '' ? 'true' : 'false' }},
             availableFrom: '{{ old('available_from', $isEditing && $agent->available_from ? substr($agent->available_from, 0, 5) : '') }}',
             availableUntil: '{{ old('available_until', $isEditing && $agent->available_until ? substr($agent->available_until, 0, 5) : '') }}'
-        }" x-init="$watch('hasTimeWindow', val => { if (!val) { availableFrom = '';
-                availableUntil = ''; } })">
+        }" x-init="$watch('hasTimeWindow', val => {
+            if (!val) {
+                availableFrom = '';
+                availableUntil = '';
+            }
+        })">
             <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
                 {{ __('app.teacher.agents.form.availability') }}
             </p>
@@ -172,6 +176,35 @@
             <input type="hidden" name="history_is_disabled" :value="historyDisabled ? '1' : '0'">
 
             <x-toggle model="historyDisabled" :on-label="__('app.teacher.agents.form.history_disabled')" :off-label="__('app.teacher.agents.form.history_enabled')" class="mb-1" />
+        </div>
+
+        <div class="px-5 py-4" x-data="{ uploadsAllowed: {{ old('file_uploads_allowed', $isEditing ? ($agent->file_uploads_allowed ? '1' : '0') : '0') !== '0' ? 'true' : 'false' }} }">
+            <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
+                {{ __('app.teacher.agents.form.uploads_heading') }}
+            </p>
+
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                {{ __('app.teacher.agents.form.uploads_help') }}</p>
+
+            <input type="hidden" name="file_uploads_allowed" :value="uploadsAllowed ? '1' : '0'">
+
+            <x-toggle model="uploadsAllowed" :on-label="__('app.teacher.agents.form.uploads_enabled')" :off-label="__('app.teacher.agents.form.uploads_disabled')" class="mb-3" />
+
+            <div x-show="uploadsAllowed" class="flex items-end gap-3">
+                <div>
+                    <label for="file_uploads_limit"
+                        class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('app.teacher.agents.form.uploads_limit') }}</label>
+                    <input id="file_uploads_limit" name="file_uploads_limit" type="number" min="1"
+                        max="50"
+                        value="{{ old('file_uploads_limit', $isEditing ? (int) ($agent->file_uploads_limit ?? 5) : 5) }}"
+                        class="w-28 rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
+                </div>
+                <p class="pb-2 text-xs text-gray-500 dark:text-gray-400">
+                    {{ __('app.teacher.agents.form.uploads_limit_help') }}</p>
+            </div>
+            @error('file_uploads_limit')
+                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="px-5 py-4">

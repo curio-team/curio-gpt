@@ -15,9 +15,11 @@ return [
     ],
 
     'common' => [
+        'add' => 'Toevoegen',
         'copy' => 'Kopiëren',
         'copied' => 'Gekopieerd',
         'copy_code' => 'Code kopiëren',
+        'attach_files' => 'Bestanden bijvoegen',
         'model' => 'Model',
         'message' => 'Bericht',
         'history' => 'Geschiedenis',
@@ -119,6 +121,13 @@ return [
                 'select_none' => 'Niets selecteren',
                 'no_groups_match' => 'Geen groepen komen overeen met je zoekopdracht.',
                 'no_groups_available' => 'Geen groepen beschikbaar.',
+
+                'uploads_heading' => 'Geuploade bestanden',
+                'uploads_help' => 'Sta studenten toe om bestanden aan hun chatberichten toe te voegen. Bestanden worden privé opgeslagen en geüpload naar de AI-provider zodat de AI ze kan gebruiken.',
+                'uploads_enabled' => 'Bestanduploads toegestaan',
+                'uploads_disabled' => 'Bestanduploads niet toegestaan',
+                'uploads_limit' => 'Bestandslimiet per gesprek',
+                'uploads_limit_help' => 'Maximaal aantal bestanden dat aan een enkel gesprek kan worden toegevoegd.',
 
                 'student_selectable_models' => 'Modellen die studenten kunnen kiezen',
                 'student_selectable_models_help' => 'Kies welke OpenAI-modellen studenten voor deze assistent kunnen selecteren. Gesorteerd op geschatte totale prijs per 1M tokens (goedkoopst eerst). Laat leeg om altijd de systeemstandaard te gebruiken.',
