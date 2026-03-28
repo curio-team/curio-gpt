@@ -30,7 +30,7 @@ To get started with Curio GPT, follow these steps:
     ```bash
     cp .env.example .env
     ```
-    
+
     Be sure to fill at least:
     - `OPENAI_API_KEY` with your OpenAI API key.
     - `SD_CLIENT_ID` and `SD_CLIENT_SECRET` with a valid SD Client App information.
@@ -47,10 +47,9 @@ To get started with Curio GPT, follow these steps:
     php artisan storage:link
     ```
 
-7. Create the database and run migrations:
+7. Run migrations:
 
     ```bash
-    touch database/database.sqlite
     php artisan migrate
     ```
 
@@ -60,4 +59,4 @@ To get started with Curio GPT, follow these steps:
     composer run dev
     ```
 
-Access the application at `http://localhost:8000` and start configuring your AI assistant!
+Access the application at `http://127.0.0.1:8000` and start configuring your AI assistant!
