@@ -2,16 +2,16 @@
 
 return [
     'nav' => [
-        'manage_agents' => 'Agents beheren',
+        'manage_agents' => 'Assistenten beheren',
         'monitoring' => 'Monitoring',
         'log_in' => 'Inloggen',
     ],
 
     'home' => [
         'title' => 'Welkom',
-        'choose_agent' => 'Kies een agent',
-        'select_agent_to_start' => 'Selecteer een agent om te beginnen met chatten.',
-        'no_agents_available' => 'Er zijn nog geen agents voor je beschikbaar.',
+        'choose_agent' => 'Kies een assistent',
+        'select_agent_to_start' => 'Selecteer een assistent om te beginnen met chatten.',
+        'no_agents_available' => 'Er zijn nog geen assistenten voor je beschikbaar.',
     ],
 
     'common' => [
@@ -47,37 +47,37 @@ return [
 
     'teacher' => [
         'agents' => [
-            'manage_title' => 'Agents beheren',
-            'agents' => 'Agents',
-            'new_agent' => 'Nieuwe agent',
-            'no_agents_yet' => 'Nog geen agents. Maak er een om te beginnen.',
+            'manage_title' => 'Assistenten beheren',
+            'agents' => 'Assistenten',
+            'new_agent' => 'Nieuwe assistent',
+            'no_agents_yet' => 'Nog geen assistenten. Maak er een om te beginnen.',
             'always_available' => 'Altijd beschikbaar',
-            'delete_confirm' => 'Deze agent verwijderen?',
+            'delete_confirm' => 'Deze assistent verwijderen?',
             'view_all_student_chats' => '→ Alle studentchats bekijken',
-            'observations' => 'Agentobservaties',
+            'observations' => 'Assistentobservaties',
             'revoke_history' => 'Geschiedenis intrekken',
-            'revoke_history_confirm' => 'Weet je zeker dat je de gesprekshistorie voor studenten voor deze agent wilt intrekken? Dit zal direct alle bestaande gesprekken voor studenten verbergen, maar docenten kunnen ze nog steeds bekijken.',
+            'revoke_history_confirm' => 'Weet je zeker dat je de gesprekshistorie voor studenten voor deze assistent wilt intrekken? Dit zal direct alle bestaande gesprekken voor studenten verbergen, maar docenten kunnen ze nog steeds bekijken.',
 
             'flash' => [
-                'created' => 'Agent succesvol aangemaakt.',
-                'updated' => 'Agent succesvol bijgewerkt.',
-                'deleted' => 'Agent verwijderd.',
+                'created' => 'Assistent succesvol aangemaakt.',
+                'updated' => 'Assistent succesvol bijgewerkt.',
+                'deleted' => 'Assistent verwijderd.',
                 'attachment_uploaded' => 'Bijlage geüpload.',
                 'upload_failed' => 'Upload mislukt: :msg',
                 'attachment_not_found' => 'Bijlage niet gevonden.',
                 'attachment_deleted' => 'Bijlage verwijderd.',
-                'history_revoked' => 'Gesprekshistorie is ingetrokken voor studenten van deze agent.',
+                'history_revoked' => 'Gesprekshistorie is ingetrokken voor studenten van deze assistent.',
             ],
 
             'create' => [
-                'back' => 'Terug naar agents',
-                'title' => 'Nieuwe agent',
-                'submit' => 'Agent aanmaken',
+                'back' => 'Terug naar assistenten',
+                'title' => 'Nieuwe assistent',
+                'submit' => 'Assistent aanmaken',
             ],
 
             'edit' => [
-                'back' => 'Terug naar agents',
-                'title' => 'Agent bewerken',
+                'back' => 'Terug naar assistenten',
+                'title' => 'Assistent bewerken',
                 'submit' => 'Wijzigingen opslaan',
             ],
 
@@ -96,7 +96,7 @@ return [
                 'image' => 'Afbeelding',
                 'upload_new_image' => 'Upload een nieuwe afbeelding om de huidige te vervangen.',
                 'instructions' => 'Instructies',
-                'instructions_placeholder' => 'Beschrijf hoe de agent zich moet gedragen…',
+                'instructions_placeholder' => 'Beschrijf hoe de assistent zich moet gedragen…',
 
                 'availability' => 'Beschikbaarheid',
                 'enabled' => 'Ingeschakeld',
@@ -108,12 +108,12 @@ return [
                 'current_server_time' => 'Huidige servertijd:',
 
                 'conversation_history' => 'Conversatielijst',
-                'conversation_history_help' => 'Uitschakelen om te voorkomen dat studenten de vorige chats voor deze agent kunnen zien of terugkeren. Bestaande geschiedenis blijft tot je het intrekt.',
+                'conversation_history_help' => 'Uitschakelen om te voorkomen dat studenten de vorige chats voor deze assistent kunnen zien of terugkeren. Bestaande geschiedenis blijft tot je het intrekt.',
                 'history_enabled' => 'Geschiedenis ingeschakeld',
                 'history_disabled' => 'Geschiedenis uitgeschakeld',
 
                 'groups_heading' => 'Toegankelijk voor groepen',
-                'groups_help' => 'Selecteer welke groepen toegang hebben tot deze agent. Docenten hebben altijd toegang.',
+                'groups_help' => 'Selecteer welke groepen toegang hebben tot deze assistent. Docenten hebben altijd toegang.',
                 'search_groups' => 'Groepen zoeken…',
                 'select_all' => 'Alles selecteren',
                 'select_none' => 'Niets selecteren',
@@ -121,20 +121,20 @@ return [
                 'no_groups_available' => 'Geen groepen beschikbaar.',
 
                 'student_selectable_models' => 'Modellen die studenten kunnen kiezen',
-                'student_selectable_models_help' => 'Kies welke OpenAI-modellen studenten voor deze agent kunnen selecteren. Gesorteerd op geschatte totale prijs per 1M tokens (goedkoopst eerst). Laat leeg om altijd de systeemstandaard te gebruiken.',
+                'student_selectable_models_help' => 'Kies welke OpenAI-modellen studenten voor deze assistent kunnen selecteren. Gesorteerd op geschatte totale prijs per 1M tokens (goedkoopst eerst). Laat leeg om altijd de systeemstandaard te gebruiken.',
                 'search_models' => 'Modellen zoeken…',
                 'no_models_match' => 'Geen modellen komen overeen met je zoekopdracht.',
 
                 'monitoring_enabled' => 'Monitoring ingeschakeld',
                 'monitoring_disabled' => 'Monitoring uitgeschakeld',
                 'monitoring_instructions' => 'Monitoring-instructies',
-                'monitoring_instructions_placeholder' => 'Beschrijf hoe de monitoringagent chats moet observeren en wanneer de ReportObservation-tool gebruikt moet worden…',
-                'monitoring_help' => 'Met de monitoringfunctie kan het systeem de chatberichten observeren die de student naar deze agent stuurt. Zo kun je opmerkelijke gebeurtenissen identificeren, zoals slimme vragen of momenten waarop de student vastloopt.',
-                'monitoring_model' => 'Model voor monitoringagent',
+                'monitoring_instructions_placeholder' => 'Beschrijf hoe het systeem chats moet observeren en notable events moet rapporteren',
+                'monitoring_help' => 'Met de monitoringfunctie kan het systeem de chatberichten observeren die de student naar deze assistent stuurt. Zo kun je opmerkelijke gebeurtenissen identificeren, zoals slimme vragen of momenten waarop de student vastloopt.',
+                'monitoring_model' => 'Model voor monitoring',
                 'use_system_default' => 'Systeemstandaard gebruiken',
 
                 'teacher_attachments' => 'Docentbijlagen',
-                'attachments_help' => 'Upload documenten waar de AI naar kan verwijzen. Bestanden worden privé opgeslagen en ook geüpload naar de AI-provider. Chats van studenten met deze agent bevatten deze bijlagen.',
+                'attachments_help' => 'Upload documenten waar de AI naar kan verwijzen. Bestanden worden privé opgeslagen en ook geüpload naar de AI-provider. Chats van studenten met deze assistent bevatten deze bijlagen.',
                 'delete_attachment_confirm' => 'Deze bijlage verwijderen?',
                 'no_attachments_yet' => 'Nog geen bijlagen geüpload.',
 
@@ -155,7 +155,7 @@ return [
         ],
 
         'observations' => [
-            'title' => 'Agentobservaties',
+            'title' => 'Assistentobservaties',
             'view_chats' => 'Chats bekijken',
             'no_observations_yet' => 'Nog geen observaties.',
             'back' => 'Terug naar observaties',
