@@ -22,7 +22,7 @@ class CustomAgentController extends Controller
         if ($request->user()->isTeacher()) {
             $agents = AgentConfig::orderBy('name')
                 ->get(['id', 'name', 'description', 'image_path'])
-                ->map(fn (AgentConfig $agent) => [
+                ->map(fn(AgentConfig $agent) => [
                     'id' => $agent->id,
                     'name' => $agent->name,
                     'description' => $agent->description,
@@ -51,7 +51,7 @@ class CustomAgentController extends Controller
                 return count(array_intersect($allowedGroups, $userGroupIds)) > 0;
             })
             ->values()
-            ->map(fn (AgentConfig $agent) => [
+            ->map(fn(AgentConfig $agent) => [
                 'id' => $agent->id,
                 'name' => $agent->name,
                 'description' => $agent->description,
@@ -121,7 +121,7 @@ class CustomAgentController extends Controller
         $attachments = collect($agentConfig->attachments ?? [])
             ->pluck('provider_file_id')
             ->filter()
-            ->map(fn (string $id) => AiDocument::fromId($id))
+            ->map(fn(string $id) => AiDocument::fromId($id))
             ->values()
             ->all();
 
@@ -155,14 +155,14 @@ class CustomAgentController extends Controller
             });
 
             foreach ($stream as $event) {
-                yield 'data: '.((string) $event)."\n\n";
+                yield 'data: ' . ((string) $event) . "\n\n";
             }
 
             if ($conversationId) {
-                yield 'data: '.json_encode([
+                yield 'data: ' . json_encode([
                     'type' => 'conversation_id',
                     'conversation_id' => $conversationId,
-                ])."\n\n";
+                ]) . "\n\n";
             }
 
             yield "data: [DONE]\n\n";

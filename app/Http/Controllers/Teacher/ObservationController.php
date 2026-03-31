@@ -38,7 +38,6 @@ class ObservationController extends Controller
                 'o.category',
                 'o.content',
                 'o.conversation_id',
-                'o.meta',
                 'o.created_at',
                 'ac.name as agent_name',
                 'u.name as student_name',

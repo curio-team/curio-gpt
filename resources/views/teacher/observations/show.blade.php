@@ -45,14 +45,5 @@
             </div>
         @endif
 
-        @if ($observation->meta)
-            <div class="mt-6">
-                <h2 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('app.teacher.observations.metadata') }}</h2>
-                <pre
-                    class="text-xs p-3 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 overflow-auto">{{ json_encode(json_decode($observation->meta, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
-            </div>
-        @endif
-
     </div>
 @endsection

@@ -7,7 +7,12 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js', 'resources/js/chat.js'],
+            input: [
+                'resources/css/app.css',
+                'resources/js/app.js',
+                'resources/js/chat.js',
+                'resources/js/teacher-chat.js',
+            ],
             refresh: true,
         }),
         tailwindcss(),

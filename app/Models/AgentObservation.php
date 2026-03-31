@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
-#[Fillable(['agent_config_id', 'user_id', 'conversation_id', 'category', 'content', 'meta'])]
+#[Fillable(['agent_config_id', 'user_id', 'conversation_id', 'category', 'content'])]
 class AgentObservation extends Model
 {
     use HasFactory;
