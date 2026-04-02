@@ -81,8 +81,10 @@
                     </div>
                     <p id="status" class="mt-1.5 text-xs text-gray-400 dark:text-gray-500 text-center h-4"></p>
                 </form>
+                <div class="text-xs text-gray-600 dark:text-gray-400 mt-2 text-center">
+                    {{ __('app.chat.ai_disclaimer') }}
+                </div>
             </div>
-
         </div>
     </div>
 

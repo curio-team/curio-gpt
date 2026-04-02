@@ -43,6 +43,7 @@ return [
 
     'chat' => [
         'start_new_chat' => 'Nieuwe chat starten',
+        'ai_disclaimer' => 'AI maakt fouten. Deze AI kan niet op het internet zoeken en weet alleen wat het is getraind.',
     ],
 
     'teacher' => [

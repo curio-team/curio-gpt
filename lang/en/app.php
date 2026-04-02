@@ -43,6 +43,7 @@ return [
 
     'chat' => [
         'start_new_chat' => 'Start a new chat',
+        'ai_disclaimer' => 'AI make mistakes. This AI cannot search the internet and only knows what it was trained on.',
     ],
 
     'teacher' => [
