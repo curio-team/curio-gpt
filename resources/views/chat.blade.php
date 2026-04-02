@@ -30,7 +30,8 @@
     {{-- Chat pane --}}
     <div class="flex flex-col min-h-0 flex-1 overflow-hidden">
         <div class="flex flex-col min-h-0 flex-1 mx-auto w-full max-w-3xl" data-agent-config-id="{{ $agentConfig->id }}"
-            data-history-disabled="{{ $agentConfig->history_is_disabled ? '1' : '0' }}">
+            data-history-disabled="{{ $agentConfig->history_is_disabled ? '1' : '0' }}"
+            data-turn-limit="{{ $agentConfig->turn_limit }}">
             @if (!empty($agentConfig->allowed_models))
                 <div class="mt-4 flex self-end gap-4 items-center justify-between">
                     <label for="model-select"
@@ -50,13 +51,32 @@
 
             {{-- Input area --}}
             <div class="shrink-0 px-4 pb-4 pt-1">
+                {{-- Turn limit reached banner (hidden by default) --}}
+                <div id="turn-limit-banner" style="display: none;"
+                    class="mb-3 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 px-4 py-4 text-center">
+                    <p class="text-sm font-medium text-black dark:text-white mb-1">
+                        {{ __('app.chat.turn_limit_reached') }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                        {{ __('app.chat.turn_limit_start_new') }}
+                    </p>
+                    <button id="turn-limit-new-chat-btn" type="button"
+                        class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition-opacity">
+                        + {{ __('app.chat.start_new_chat') }}
+                    </button>
+                </div>
+
                 <form id="chat-form">
                     <div
                         class="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 shadow-sm focus-within:ring-2 focus-within:ring-black/10 dark:focus-within:ring-white/15 transition-shadow">
-                        <label for="prompt" class="sr-only">{{ __('app.common.message') }}</label>
-                        <textarea id="prompt" name="prompt" placeholder="{{ __('app.common.type_a_message') }}" rows="1"
-                            class="w-full resize-none bg-transparent px-4 pt-3.5 pb-2 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none"
-                            placeholder="{{ __('app.common.message') }} {{ $agentConfig->name }}…"></textarea>
+                        <div class="flex items-center justify-between px-4 pt-3.5 pb-2">
+                            <label for="prompt" class="sr-only">{{ __('app.common.message') }}</label>
+                            <textarea id="prompt" name="prompt" placeholder="{{ __('app.common.type_a_message') }}" rows="1"
+                                class="w-full resize-none bg-transparent text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none"
+                                placeholder="{{ __('app.common.message') }} {{ $agentConfig->name }}…"></textarea>
+                            <p id="turn-counter" class="shrink-0 text-xs text-gray-400 dark:text-gray-500 text-center"
+                                style="display: none;"></p>
+                        </div>
                         <div class="flex items-center justify-between px-4 pb-3">
                             <span class="text-xs text-gray-500 dark:text-gray-600 select-none">
                                 {{ __('app.common.enter_to_send') }} &middot; {{ __('app.common.shift_enter_new_line') }}
@@ -79,7 +99,6 @@
                             </div>
                         </div>
                     </div>
-                    <p id="status" class="mt-1.5 text-xs text-gray-400 dark:text-gray-500 text-center h-4"></p>
                 </form>
                 <div class="text-xs text-gray-600 dark:text-gray-400 mt-2 text-center">
                     {{ __('app.chat.ai_disclaimer') }}
@@ -89,6 +108,9 @@
     </div>
 
     {{-- UI templates for chat.js (for localization-friendly HTML) --}}
+
+    {{-- Turn counter text template (JS replaces :used and :limit) --}}
+    <template id="tpl-turn-counter-text">{{ __('app.chat.turn_counter') }}</template>
     <template id="tpl-user-message">
         <div class="flex justify-end mb-6 group">
             <div class="flex flex-col items-end gap-1.5 max-w-[80%]">

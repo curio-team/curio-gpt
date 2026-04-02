@@ -91,6 +91,26 @@ class CustomAgentController extends Controller
         $agent = (new CustomAgent($agentConfig->instructions))
             ->forUser($request->user());
 
+        // Enforce turn limit: count existing user messages in the conversation.
+        $existingUserTurns = 0;
+        if (isset($validated['branchFrom'])) {
+            $existingUserTurns = DB::table('agent_conversation_messages')
+                ->where('conversation_id', $validated['branchFrom']['conversationId'])
+                ->where('role', 'user')
+                ->orderBy('id')
+                ->limit($validated['branchFrom']['keepMessageCount'])
+                ->count();
+        } elseif ($validated['conversationId'] ?? null) {
+            $existingUserTurns = DB::table('agent_conversation_messages')
+                ->where('conversation_id', $validated['conversationId'])
+                ->where('role', 'user')
+                ->count();
+        }
+
+        if ($existingUserTurns >= $agentConfig->turn_limit) {
+            return response()->json(['message' => 'Turn limit reached.'], 429);
+        }
+
         if (isset($validated['branchFrom'])) {
             $targetConversationId = $this->branchConversation(
                 $request->user(),

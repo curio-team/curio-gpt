@@ -44,6 +44,9 @@ return [
     'chat' => [
         'start_new_chat' => 'Start a new chat',
         'ai_disclaimer' => 'AI make mistakes. This AI cannot search the internet and only knows what it was trained on.',
+        'turn_counter' => ':used / :limit messages',
+        'turn_limit_reached' => 'You have reached the maximum number of messages for this chat.',
+        'turn_limit_start_new' => 'Start a new chat to continue.',
     ],
 
     'teacher' => [
@@ -112,6 +115,9 @@ return [
                 'conversation_history_help' => 'Disable to prevent students from seeing or returning to previous chats for this assistant. Existing history remains until you revoke it.',
                 'history_enabled' => 'History enabled',
                 'history_disabled' => 'History disabled',
+
+                'turn_limit' => 'Turn Limit',
+                'turn_limit_help' => 'Maximum number of messages a student can send in a single chat. This helps prevent costs from getting too high per chat and encourages students to start new chats for new topics.',
 
                 'groups_heading' => 'Accessible to Groups',
                 'groups_help' => 'Select which groups can access this assistant. Teachers always have access.',

@@ -44,6 +44,9 @@ return [
     'chat' => [
         'start_new_chat' => 'Nieuwe chat starten',
         'ai_disclaimer' => 'AI maakt fouten. Deze AI kan niet op het internet zoeken en weet alleen wat het is getraind.',
+        'turn_counter' => ':used / :limit berichten',
+        'turn_limit_reached' => 'Je hebt het maximale aantal berichten voor deze chat bereikt.',
+        'turn_limit_start_new' => 'Start een nieuwe chat om verder te gaan.',
     ],
 
     'teacher' => [
@@ -112,6 +115,9 @@ return [
                 'conversation_history_help' => 'Uitschakelen om te voorkomen dat studenten de vorige chats voor deze assistent kunnen zien of terugkeren. Bestaande geschiedenis blijft tot je het intrekt.',
                 'history_enabled' => 'Geschiedenis ingeschakeld',
                 'history_disabled' => 'Geschiedenis uitgeschakeld',
+
+                'turn_limit' => 'Vragenlimiet',
+                'turn_limit_help' => 'Maximaal aantal berichten dat een student in één chat mag sturen. Zo voorkomen we dat de kosten per chat te hoog oplopen en moedigen we studenten aan om nieuwe chats te starten voor nieuwe onderwerpen.',
 
                 'groups_heading' => 'Toegankelijk voor groepen',
                 'groups_help' => 'Selecteer welke groepen toegang hebben tot deze assistent. Docenten hebben altijd toegang.',

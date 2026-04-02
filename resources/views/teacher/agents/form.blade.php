@@ -121,8 +121,12 @@
             hasTimeWindow: {{ old('available_from', $isEditing ? $agent->available_from ?? '' : '') !== '' || old('available_until', $isEditing ? $agent->available_until ?? '' : '') !== '' ? 'true' : 'false' }},
             availableFrom: '{{ old('available_from', $isEditing && $agent->available_from ? substr($agent->available_from, 0, 5) : '') }}',
             availableUntil: '{{ old('available_until', $isEditing && $agent->available_until ? substr($agent->available_until, 0, 5) : '') }}'
-        }" x-init="$watch('hasTimeWindow', val => { if (!val) { availableFrom = '';
-                availableUntil = ''; } })">
+        }" x-init="$watch('hasTimeWindow', val => {
+            if (!val) {
+                availableFrom = '';
+                availableUntil = '';
+            }
+        })">
             <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
                 {{ __('app.teacher.agents.form.availability') }}
             </p>
@@ -172,6 +176,23 @@
             <input type="hidden" name="history_is_disabled" :value="historyDisabled ? '1' : '0'">
 
             <x-toggle model="historyDisabled" :on-label="__('app.teacher.agents.form.history_disabled')" :off-label="__('app.teacher.agents.form.history_enabled')" class="mb-1" />
+        </div>
+
+        <div class="px-5 py-4">
+            <p class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
+                {{ __('app.teacher.agents.form.turn_limit') }}
+            </p>
+
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                {{ __('app.teacher.agents.form.turn_limit_help') }}
+            </p>
+
+            <input id="turn_limit" name="turn_limit" type="number" min="1" max="1000"
+                value="{{ old('turn_limit', $agent->turn_limit ?? 25) }}"
+                class="w-32 rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
+            @error('turn_limit')
+                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="px-5 py-4">
@@ -417,8 +438,7 @@
                             <div class="shrink-0 flex items-center gap-2">
                                 <a href="{{ route('teacher.agents.attachments.download', [$agent, $att['id'] ?? '']) }}"
                                     class="rounded-lg border border-black/10 dark:border-white/10 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{{ __('app.common.download') }}</a>
-                                <button type="submit"
-                                    form="agent-attachment-delete-{{ $att['id'] ?? '' }}"
+                                <button type="submit" form="agent-attachment-delete-{{ $att['id'] ?? '' }}"
                                     onclick="return confirm('{{ __('app.teacher.agents.form.delete_attachment_confirm') }}')"
                                     class="rounded-lg border border-black/10 dark:border-white/10 px-2 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors">{{ __('app.common.delete') }}</button>
                             </div>

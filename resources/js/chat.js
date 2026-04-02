@@ -98,14 +98,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const promptEl = document.getElementById('prompt');
     const messagesEl = document.getElementById('messages');
-    const statusEl = document.getElementById('status');
     const sendBtn = document.getElementById('send-btn');
     const cancelEditBtn = document.getElementById('cancel-edit-btn');
     const chatContainer = document.querySelector('[data-agent-config-id]');
     const modelSelect = document.getElementById('model-select');
+    const turnCounterEl = document.getElementById('turn-counter');
+    const turnLimitBanner = document.getElementById('turn-limit-banner');
+    const turnLimitNewChatBtn = document.getElementById('turn-limit-new-chat-btn');
     const selectedAgentConfigId = chatContainer?.dataset.agentConfigId ?? null;
+    const turnLimit = parseInt(chatContainer?.dataset.turnLimit ?? '0', 10);
     let conversationId = null;
     let isStreaming = false;
+    let userTurnCount = 0;
 
     /**
      * Tracks all rendered messages in order: [{type, text, el}]
@@ -187,6 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         removed.forEach((m) => m.el.remove());
 
+        // Recalculate turn count from remaining messages
+        userTurnCount = chatMessages.filter((m) => m.type === 'user').length;
+        unlockChat();
+        updateTurnCounter();
+
         promptEl.value = originalText;
         autoResize();
         promptEl.focus();
@@ -202,6 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
             messagesEl.appendChild(m.el);
             chatMessages.push(m);
         });
+
+        // Restore turn count from full message list
+        userTurnCount = chatMessages.filter((m) => m.type === 'user').length;
+        updateTurnCounter();
 
         pendingEdit = null;
         promptEl.value = '';
@@ -222,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    function addUserMessage(text) {
+    function addUserMessage(text, skipCountIncrement = false) {
         const index = chatMessages.length;
         const el = cloneTemplate('tpl-user-message');
 
@@ -238,6 +251,11 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollBottom();
 
         chatMessages.push({ type: 'user', text, el });
+
+        if (!skipCountIncrement) {
+            userTurnCount++;
+            updateTurnCounter();
+        }
     }
 
     function createAssistantBubble() {
@@ -261,8 +279,50 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─ Loading state ───────────────────────────────────────────────────────────
     function setLoading(loading) {
         isStreaming = loading;
-        sendBtn.disabled = loading;
+        sendBtn.disabled = loading || (turnLimit > 0 && userTurnCount >= turnLimit);
         promptEl.focus();
+    }
+
+    // ─ Turn limit helpers ──────────────────────────────────────────────────────
+    function updateTurnCounter() {
+        if (!turnLimit || turnLimit <= 0) { return; }
+
+        const tpl = document.getElementById('tpl-turn-counter-text');
+        const pattern = tpl?.content?.textContent?.trim() ?? ':used / :limit messages';
+        const text = pattern.replace(':used', String(userTurnCount)).replace(':limit', String(turnLimit));
+
+        if (turnCounterEl) {
+            turnCounterEl.textContent = text;
+            turnCounterEl.style.removeProperty('display');
+
+            const remaining = turnLimit - userTurnCount;
+            if (remaining <= 5 && remaining > 0) {
+                turnCounterEl.classList.add('text-amber-500', 'dark:text-amber-400');
+                turnCounterEl.classList.remove('text-gray-400', 'dark:text-gray-500');
+            } else {
+                turnCounterEl.classList.remove('text-amber-500', 'dark:text-amber-400');
+                turnCounterEl.classList.add('text-gray-400', 'dark:text-gray-500');
+            }
+        }
+
+        if (userTurnCount >= turnLimit) {
+            lockChat();
+        }
+    }
+
+    function lockChat() {
+        if (turnLimitBanner) { turnLimitBanner.style.removeProperty('display'); }
+        if (form) { form.style.setProperty('display', 'none'); }
+    }
+
+    function unlockChat() {
+        if (turnLimitBanner) { turnLimitBanner.style.setProperty('display', 'none'); }
+        if (form) { form.style.removeProperty('display'); }
+        if (turnCounterEl) { turnCounterEl.style.setProperty('display', 'none'); }
+    }
+
+    if (turnLimitNewChatBtn) {
+        turnLimitNewChatBtn.addEventListener('click', startNewChat);
     }
 
     // ─ Submit ──────────────────────────────────────────────────────────────────
@@ -291,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         addUserMessage(prompt);
         setLoading(true);
-        statusEl.textContent = '';
 
         try {
             await ensureCsrfCookie();
@@ -323,6 +382,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) {
                 if (res.status === 401) {
                     addErrorMessage('Please log in to chat with the agent.');
+                    return;
+                }
+
+                if (res.status === 429) {
+                    lockChat();
                     return;
                 }
 
@@ -502,10 +566,12 @@ document.addEventListener('DOMContentLoaded', () => {
             pendingEdit = null;
             setEditMode(false);
             conversationId = id;
+            userTurnCount = 0;
 
             messages.forEach((msg) => {
                 if (msg.role === 'user') {
-                    addUserMessage(msg.content);
+                    addUserMessage(msg.content, true);
+                    userTurnCount++;
                 } else if (msg.role === 'assistant') {
                     const { el: assistantEl, contentEl, copyBtn } = createAssistantBubble();
                     contentEl.innerHTML = marked.parse(msg.content);
@@ -513,6 +579,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     chatMessages.push({ type: 'assistant', text: msg.content, el: assistantEl });
                 }
             });
+
+            unlockChat();
+            updateTurnCounter();
 
             setActiveConversation(id);
             scrollBottom();
@@ -529,6 +598,8 @@ document.addEventListener('DOMContentLoaded', () => {
         pendingEdit = null;
         setEditMode(false);
         conversationId = null;
+        userTurnCount = 0;
+        unlockChat();
         setActiveConversation(null);
         promptEl.focus();
     }
