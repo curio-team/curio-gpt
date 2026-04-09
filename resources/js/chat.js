@@ -106,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const turnLimitBanner = document.getElementById('turn-limit-banner');
     const turnLimitNewChatBtn = document.getElementById('turn-limit-new-chat-btn');
     const selectedAgentConfigId = chatContainer?.dataset.agentConfigId ?? null;
+    const modelStorageKey = selectedAgentConfigId ? `model-select:${selectedAgentConfigId}` : null;
     const turnLimit = parseInt(chatContainer?.dataset.turnLimit ?? '0', 10);
     let conversationId = null;
     let isStreaming = false;
@@ -128,6 +129,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function autoResize() {
         promptEl.style.height = 'auto';
         promptEl.style.height = Math.min(promptEl.scrollHeight, 192) + 'px';
+    }
+
+    // ─ Persist selected model ─────────────────────────────────────────────────
+    if (modelSelect && modelStorageKey) {
+        const savedModel = localStorage.getItem(modelStorageKey);
+        if (savedModel && modelSelect.querySelector(`option[value="${savedModel}"]`)) {
+            modelSelect.value = savedModel;
+        }
+        modelSelect.addEventListener('change', () => {
+            localStorage.setItem(modelStorageKey, modelSelect.value);
+        });
     }
 
     promptEl.addEventListener('input', autoResize);

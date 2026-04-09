@@ -38,7 +38,7 @@
                         class="text-xs text-gray-500 dark:text-gray-400">{{ __('app.common.model') }}</label>
                     <select id="model-select" name="model"
                         class="rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 px-2 py-1.5 text-xs text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15">
-                        @foreach ($agentConfig->allowed_models as $model)
+                        @foreach (collect($agentConfig->allowed_models)->sort()->values() as $model)
                             <option value="{{ $model }}">{{ $model }}</option>
                         @endforeach
                     </select>
