@@ -360,7 +360,7 @@
                     </label>
                     <textarea id="monitoring_instructions" name="monitoring_instructions" rows="6"
                         class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15 resize-y"
-                        placeholder="{{ __('app.teacher.agents.form.monitoring_instructions_placeholder') }}" maxlength="10000">{{ old('monitoring_instructions', $agent->monitoring_instructions ?? '') }}</textarea>
+                        placeholder="{{ __('app.teacher.agents.form.monitoring_instructions_placeholder') }}" maxlength="50000">{{ old('monitoring_instructions', $agent->monitoring_instructions ?? '') }}</textarea>
                     @error('monitoring_instructions')
                         <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                     @enderror

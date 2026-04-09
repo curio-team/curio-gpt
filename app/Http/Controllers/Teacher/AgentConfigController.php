@@ -45,7 +45,7 @@ class AgentConfigController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:300'],
-            'instructions' => ['required', 'string', 'max:10000'],
+            'instructions' => ['required', 'string', 'max:50000'],
             'allowed_groups' => ['nullable', 'array'],
             'allowed_groups.*' => ['integer'],
             'allowed_models' => ['nullable', 'array'],
@@ -57,7 +57,7 @@ class AgentConfigController extends Controller
             'available_from' => ['nullable', 'date_format:H:i'],
             'available_until' => ['nullable', 'date_format:H:i'],
             'monitoring_is_enabled' => ['required', 'boolean'],
-            'monitoring_instructions' => ['nullable', 'string', 'max:10000'],
+            'monitoring_instructions' => ['nullable', 'string', 'max:50000'],
             'monitoring_model' => ['nullable', 'string', 'max:100'],
         ]);
 
@@ -90,7 +90,7 @@ class AgentConfigController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:300'],
-            'instructions' => ['required', 'string', 'max:10000'],
+            'instructions' => ['required', 'string', 'max:50000'],
             'allowed_groups' => ['nullable', 'array'],
             'allowed_groups.*' => ['integer'],
             'allowed_models' => ['nullable', 'array'],
@@ -102,7 +102,7 @@ class AgentConfigController extends Controller
             'available_from' => ['nullable', 'date_format:H:i'],
             'available_until' => ['nullable', 'date_format:H:i'],
             'monitoring_is_enabled' => ['required', 'boolean'],
-            'monitoring_instructions' => ['nullable', 'string', 'max:10000'],
+            'monitoring_instructions' => ['nullable', 'string', 'max:50000'],
             'monitoring_model' => ['nullable', 'string', 'max:100'],
         ]);
 
