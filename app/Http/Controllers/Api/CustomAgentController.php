@@ -64,7 +64,7 @@ class CustomAgentController extends Controller
     public function handle(Request $request)
     {
         $validated = $request->validate([
-            'prompt' => ['required', 'string', 'max:10000'],
+            'prompt' => ['required', 'string', 'max:50000'],
             'agentConfigId' => ['required', 'string', 'size:36'],
             'conversationId' => ['nullable', 'string', 'size:36'],
             'model' => ['nullable', 'string', 'max:100'],

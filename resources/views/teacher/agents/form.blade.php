@@ -106,7 +106,7 @@
             </label>
             <textarea id="instructions" name="instructions" rows="8"
                 class="w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-black dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/15 resize-y"
-                placeholder="{{ __('app.teacher.agents.form.instructions_placeholder') }}" required maxlength="10000">{{ old('instructions', $agent->instructions ?? '') }}</textarea>
+                placeholder="{{ __('app.teacher.agents.form.instructions_placeholder') }}" required maxlength="50000">{{ old('instructions', $agent->instructions ?? '') }}</textarea>
             @error('instructions')
                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
             @enderror
