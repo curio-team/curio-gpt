@@ -131,12 +131,18 @@
                             <div class="min-w-0">
                                 <p class="text-sm font-medium text-black dark:text-white truncate">{{ $row['name'] }}</p>
                             </div>
-                            <div class="shrink-0 text-right">
+                            <div class="shrink-0 flex items-center gap-4">
+                                <a href="{{ route('teacher.usage.invoice', ['userId' => $row['user_id']]) }}"
+                                    class="inline-flex items-center rounded-lg border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs font-medium text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                                    {{ __('app.teacher.usage.export_invoice_pdf') }}
+                                </a>
+                                <div class="text-right">
                                 <p class="text-sm font-semibold text-black dark:text-white">
                                     {{ number_format($row['total_tokens']) }}</p>
                                 <p class="text-2xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                                     {{ __('app.common.tokens') }}
                                 </p>
+                                </div>
                             </div>
                         </div>
                     @empty
