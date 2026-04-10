@@ -190,6 +190,7 @@ return [
             'output_tokens' => 'Uitvoertokens',
             'est_cost_usd' => 'Geschatte kosten (USD)',
             'no_recent_usage' => 'Geen recent gebruik.',
+            'export_invoice_pdf' => 'Exporteer Factuur PDF',
         ],
     ],
 

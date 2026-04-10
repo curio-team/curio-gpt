@@ -39,6 +39,7 @@ return [
         'tokens' => 'tokens',
         'date' => 'Date',
         'price_missing' => 'Price missing',
+
     ],
 
     'chat' => [
@@ -190,6 +191,7 @@ return [
             'output_tokens' => 'Output tokens',
             'est_cost_usd' => 'Est. cost (USD)',
             'no_recent_usage' => 'No recent usage.',
+            'export_invoice_pdf' => 'Export Invoice PDF',
         ],
     ],
 

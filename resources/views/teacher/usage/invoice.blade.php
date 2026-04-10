@@ -35,7 +35,7 @@
 
         .brand-sub {
             font-size: 10px;
-            color: #6b7280;
+            color: #494b54;
             margin-top: 1px;
             font-style: italic;
         }
@@ -59,7 +59,7 @@
 
         .invoice-meta {
             font-size: 10px;
-            color: #6b7280;
+            color: #494b54;
             line-height: 1.5;
         }
 
@@ -115,7 +115,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.6px;
-            color: #6b7280;
+            color: #494b54;
         }
 
         .items td {
@@ -157,7 +157,7 @@
         }
 
         .summary .label {
-            color: #6b7280;
+            color: #494b54;
             font-size: 11px;
             width: 72%;
         }
@@ -213,7 +213,7 @@
             margin-top: 10px;
         }
 
-        .payment-note em { color: #6b7280; }
+        .payment-note em { color: #494b54; }
 
         .sig-title {
             font-family: Georgia, serif;
@@ -251,7 +251,7 @@
             line-height: 1.8;
         }
 
-        .fine-print strong { color: #6b7280; }
+        .fine-print strong { color: #494b54; }
 
         /* ── Footer bar ── */
         .footer-bar {
@@ -334,7 +334,7 @@
                     <div class="meta-muted">{{ $user->email }}</div>
                 @endif
                 <div class="meta-muted">Gebruikers-ID: {{ $user->id }}</div>
-                <div class="meta-easter">Bekende alias: &ldquo;Heeft echt gestudeerd&rdquo;</div>
+                <div class="meta-easter">Bekende alias: &ldquo;Ik heb dit zelf gemaakt meneer!&rdquo;</div>
             </td>
             <td>
                 <div class="section-title">Gebruiksperiode</div>
@@ -344,7 +344,6 @@
                     <div>{{ __('app.teacher.usage.no_usage_yet') }}</div>
                 @endif
                 <div class="meta-muted">Gegenereerd door {{ config('app.name', 'CurioGPT') }}</div>
-                <div class="meta-easter">Eindtijd: 17:00 uur &mdash; want dan gaat de bel&sup3;</div>
             </td>
         </tr>
     </table>
@@ -368,7 +367,7 @@
                         $excuses = [
                             'gpt-5'      => '&ldquo;Ik ging voor de premium twijfel&rdquo;',
                             'gpt-5-mini' => '&ldquo;Budgetcontrole, je kent het wel&rdquo;',
-                            'gpt-4o'     => '&ldquo;Die gaf een ander antwoord&rdquo; &sup1;',
+                            'gpt-4o'     => '&ldquo;Die gaf een ander antwoord&rdquo;',
                             'gpt-4o-mini'=> '&ldquo;Voor een mini-vraagje moest ik gewoon even vreemdgaan&rdquo;',
                         ];
                                                 $excuse = $excuses[$item['model']] ?? '&ldquo;Geen commentaar&rdquo;';
@@ -380,7 +379,7 @@
                     @if (is_null($item['estimated_cost_usd']))
                         {{ __('app.common.price_missing') }}
                     @else
-                        ${{ number_format($item['estimated_cost_usd'], 4, ',', '.') }}
+                        €{{ number_format($item['estimated_cost_usd'], 4, ',', '.') }}
                     @endif
                 </td>
             </tr>
@@ -406,7 +405,7 @@
         </tr>
         <tr class="total-row">
             <td class="label">Geschat factuurbedrag</td>
-            <td class="value">${{ number_format($subtotalUsd, 4, ',', '.') }}</td>
+            <td class="value">€{{ number_format($subtotalUsd, 4, ',', '.') }}</td>
         </tr>
     </table>
 
@@ -417,11 +416,10 @@
                 <span class="stamp">Betaling niet vereist</span>
             </div>
             <div class="payment-note">
-                Wij accepteren geen contant geld, pinpas, crypto of tranen.<br><br>
-                Je kunt deze schuld vereffenen door ons een bezoekje te brengen
-                als je straks in de &lsquo;echte wereld&rsquo; rondloopt &mdash;
-                een kopje koffie, een kaartje, of gewoon even laten weten hoe het met je gaat
-                is meer dan genoeg.<br><br>
+                Wij accepteren geen contant geld, pinpas, crypto of pokemonkaarten.<br><br>
+                Deze factuur is te betalen door even langs te komen wanneer je aan het werk
+                bent of stage loopt. Een kopje koffie, kaartje, of gewoon even laten weten hoe
+                het gaat is ook altijd welkom!<br><br>
                 <em>We duimen voor je. Dat deden we altijd al.</em>
             </div>
         </div>
@@ -443,18 +441,19 @@
         <div class="fn-col">
             <div class="section-title">Opmerkingen &amp; disclaimer</div>
             <div class="fine-print">
-                <strong>&middot;</strong> We zien je wel, ChatGPT-gebruiker. We oordelen niet &mdash; zo heel erg.<br>
-                <strong>&middot;</strong> Tokenaantal exclusief de tokens voor driemaal hetzelfde vragen: &ldquo;Weet je het zeker?&rdquo;<br>
-                <strong>&middot;</strong> Deze factuur is een aandenken, geen aanmaning. Juridische stappen worden niet ondernomen. Waarschijnlijk.<br>
-                <strong>&middot;</strong> De AI heeft je toets technisch gezien niet gemaakt. Hij heeft slechts&hellip; je denkproces begeleid. Intensief.
+                <strong>&middot;</strong> We zien je wel, chat-gebruiker. Maar oordelen niet. (Zo erg).<br>
+                <strong>&middot;</strong> Tokenaantal is exclusief de tokens voor bedankjes en vragen of chat de volledige code wil terugsturen.<br>
+                <strong>&middot;</strong> Deze factuur is een aandenken, geen aanmaning. Juridische stappen worden niet ondernomen. (Waarschijnlijk).<br>
+                <strong>&middot;</strong> CurioGPT heeft je eindexamen niet gemaakt, hij heeft slechts (heel erg intensief) je denkproces begeleid.
             </div>
         </div>
         <div class="fn-col">
             <div class="section-title">Diplomavoorwaarden &#10022;</div>
             <div class="fine-print">
-                Door je diploma in ontvangst te nemen ga je akkoord met: (a)&nbsp;af en toe afvragen of je eigenlijk wel iets hebt geleerd,
-                (b)&nbsp;{{ config('app.name', 'CurioGPT') }} aanbevelen aan precies &eacute;&eacute;n jongere medestudent,
-                (c)&nbsp;je docent nooit over deze factuur vertellen.<br><br>
+                Door je diploma in ontvangst te nemen ga je akkoord met:
+                (a) Je af en toe af te vragen of je daadwerkelijk iets hebt geleerd.
+                (b) Soms even terug te denken aan de toch wel gezellige tijd bij Curio SD.
+                (c) Soms even terug te denken aan de leuke docenten die jouw proces hebben begeleid.<br><br>
                 <span style="font-size:9px; opacity:0.7; font-style:italic;">
                     Dit document is gegenereerd met dezelfde AI die jou heeft geholpen slagen. Ja, echt.
                 </span>
