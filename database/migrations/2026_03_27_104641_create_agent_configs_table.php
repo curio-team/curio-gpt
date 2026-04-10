@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('agent_configs', function (Blueprint $table) {
             $table->string('id', 36)->primary();
-            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
+            $table->string('created_by', 36)->nullable()->index();
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
             $table->string('name');
             $table->string('description', 300)->nullable();
             $table->string('image_path')->nullable();
