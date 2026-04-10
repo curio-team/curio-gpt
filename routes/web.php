@@ -50,6 +50,7 @@ Route::middleware(['auth', EnsureUserIsTeacher::class])
         Route::get('chats/{conversation}', [TeacherChatController::class, 'show'])->name('chats.show');
 
         Route::get('usage', [TeacherUsageController::class, 'index'])->name('usage.index');
+        Route::get('usage/{userId}/invoice', [TeacherUsageController::class, 'exportUserInvoice'])->name('usage.invoice');
 
         Route::get('observations', [TeacherObservationController::class, 'index'])->name('observations.index');
         Route::get('observations/{id}', [TeacherObservationController::class, 'show'])->name('observations.show');

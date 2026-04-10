@@ -210,6 +210,72 @@ class TokenUsageService
     }
 
     /**
+     * Aggregate lifetime assistant token usage for a single user.
+     *
+     * Returns:
+     * - by_model: Collection<int,array{model:string,input_tokens:int,output_tokens:int,total_tokens:int}>
+     * - input_tokens: int
+     * - output_tokens: int
+     * - total_tokens: int
+     * - first_usage_at: ?string
+     * - last_usage_at: ?string
+     */
+    public function usageByUser(string $userId): array
+    {
+        $totalsByModel = [];
+        $inputTotal = 0;
+        $outputTotal = 0;
+        $tokenTotal = 0;
+        $firstUsageAt = null;
+        $lastUsageAt = null;
+
+        DB::table('agent_conversation_messages as m')
+            ->where('m.user_id', $userId)
+            ->where('m.role', 'assistant')
+            ->select(['m.usage', 'm.meta', 'm.agent', 'm.created_at'])
+            ->orderBy('m.id')
+            ->chunk(1000, function ($rows) use (&$totalsByModel, &$inputTotal, &$outputTotal, &$tokenTotal, &$firstUsageAt, &$lastUsageAt) {
+                foreach ($rows as $row) {
+                    $usage = $this->parseUsage((string) $row->usage);
+                    if ($usage['total'] <= 0) {
+                        continue;
+                    }
+
+                    $model = $this->parseModel((string) $row->usage, (string) $row->meta, (string) $row->agent);
+                    if (! isset($totalsByModel[$model])) {
+                        $totalsByModel[$model] = [
+                            'model' => $model,
+                            'input_tokens' => 0,
+                            'output_tokens' => 0,
+                            'total_tokens' => 0,
+                        ];
+                    }
+
+                    $totalsByModel[$model]['input_tokens'] += $usage['input'];
+                    $totalsByModel[$model]['output_tokens'] += $usage['output'];
+                    $totalsByModel[$model]['total_tokens'] += $usage['total'];
+
+                    $inputTotal += $usage['input'];
+                    $outputTotal += $usage['output'];
+                    $tokenTotal += $usage['total'];
+
+                    $createdAt = Carbon::parse($row->created_at);
+                    $firstUsageAt = $firstUsageAt === null || $createdAt->lt($firstUsageAt) ? $createdAt : $firstUsageAt;
+                    $lastUsageAt = $lastUsageAt === null || $createdAt->gt($lastUsageAt) ? $createdAt : $lastUsageAt;
+                }
+            });
+
+        return [
+            'by_model' => collect(array_values($totalsByModel))->sortByDesc('total_tokens')->values(),
+            'input_tokens' => $inputTotal,
+            'output_tokens' => $outputTotal,
+            'total_tokens' => $tokenTotal,
+            'first_usage_at' => $firstUsageAt?->toDateTimeString(),
+            'last_usage_at' => $lastUsageAt?->toDateTimeString(),
+        ];
+    }
+
+    /**
      * Robustly parse usage JSON into token counts.
      * Returns ['input' => int, 'output' => int, 'total' => int]
      */
