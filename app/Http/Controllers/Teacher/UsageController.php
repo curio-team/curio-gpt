@@ -19,12 +19,7 @@ class UsageController extends Controller
 
     public function index(): View
     {
-        $overall = $this->usage->overallLeaderboard(100)->map(function (array $row) {
-            return [
-                ...$row,
-                'user_id' => (string) $row['user_id'],
-            ];
-        });
+        $overall = $this->usage->overallLeaderboard(100);
         $today = $this->usage->dailyLeaderboard(Carbon::today(), 50);
         $last14 = $this->usage->dailyTotalsForAll(14);
 
