@@ -13,6 +13,9 @@ function cloneTemplate(id) {
 }
 
 const renderer = {
+    html({ text }) {
+        return escapeHtml(text);
+    },
     code({ text, lang }) {
         const validLang = lang && hljs.getLanguage(lang) ? lang : 'plaintext';
         const highlighted = hljs.highlight(text, { language: validLang }).value;
