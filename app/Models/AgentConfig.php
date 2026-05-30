@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -32,7 +33,25 @@ class AgentConfig extends Model
     public $incrementing = false;
 
     /**
+     * TODO: For future implementation, we might want to add a column image_url to the agent_configs table and remove this.
+     * Right now only here to silence PHPStan.
+     *
+     * @var string|null
+     */
+    public $image_url = null;
+
+    /**
      * The attributes that should be cast to native types.
+     *
+     * @return array{
+     *     allowed_groups: 'array',
+     *     allowed_models: 'array',
+     *     attachments: 'array',
+     *     is_enabled: 'boolean',
+     *     history_is_disabled: 'boolean',
+     *     turn_limit: 'integer',
+     *     monitoring_is_enabled: 'boolean'
+     * }
      */
     protected function casts(): array
     {
@@ -60,9 +79,16 @@ class AgentConfig extends Model
 
     protected function imageUrl(): Attribute
     {
-        return Attribute::get(fn() => $this->image_path
-            ? Storage::disk('public')->url($this->image_path)
-            : null);
+        return Attribute::get(function () {
+            if ($this->image_path) {
+                /** @var FilesystemAdapter $disk */
+                $disk = Storage::disk('public');
+
+                return $disk->url($this->image_path);
+            }
+
+            return null;
+        });
     }
 
     public function isCurrentlyAvailable(): bool

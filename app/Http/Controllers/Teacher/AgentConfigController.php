@@ -7,6 +7,7 @@ use App\Models\AgentConfig;
 use App\Services\ModelPricingService;
 use App\Services\OpenAiModelService;
 use App\Services\SdApiService;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -163,7 +164,7 @@ class AgentConfigController extends Controller
             $file = $validated['attachment'];
 
             // Store privately on local disk
-            $path = $file->store('agent-attachments/' . $agent->id, 'local');
+            $path = $file->store('agent-attachments/'.$agent->id, 'local');
 
             // Upload to provider via Laravel AI SDK
             $stored = AiDocument::fromStorage($path, disk: 'local')->put();
@@ -176,7 +177,7 @@ class AgentConfigController extends Controller
                 'size' => $file->getSize(),
                 'storage_path' => $path,
                 'provider' => 'openai',
-                'provider_file_id' => $stored->id ?? null,
+                'provider_file_id' => $stored->id,
                 'uploaded_at' => now()->toISOString(),
             ];
 
@@ -201,13 +202,16 @@ class AgentConfigController extends Controller
         $attachment = collect($agent->attachments ?? [])->firstWhere('id', $attachmentId);
         abort_if(! $attachment, 404);
 
+        /** @var FilesystemAdapter $disk */
+        $disk = Storage::disk('local');
+
         $path = $attachment['storage_path'] ?? null;
-        abort_if(! $path || ! Storage::disk('local')->exists($path), 404);
+        abort_if(! $path || ! $disk->exists($path), 404);
 
         $filename = $attachment['name'] ?? basename($path);
         $mime = $attachment['mime'] ?? null;
 
-        return Storage::disk('local')->download($path, $filename, array_filter([
+        return $disk->download($path, $filename, array_filter([
             'Content-Type' => $mime,
         ]));
     }
@@ -238,7 +242,7 @@ class AgentConfigController extends Controller
             Storage::disk('local')->delete($attachment['storage_path']);
         }
 
-        $remaining = $attachments->reject(fn($a) => ($a['id'] ?? null) === $attachmentId)->values()->all();
+        $remaining = $attachments->reject(fn ($a) => ($a['id'] ?? null) === $attachmentId)->values()->all();
         $agent->update(['attachments' => $remaining]);
 
         return back()->with('success', __('app.teacher.agents.flash.attachment_deleted'));
@@ -282,9 +286,9 @@ class AgentConfigController extends Controller
             $sortKey = $overall !== null ? (float) $overall : 999999.0;
 
             if ($overall !== null) {
-                $display = '  ' . __('app.teacher.agents.form.per_million_cost', ['price' => number_format($overall, 3)]);
+                $display = '  '.__('app.teacher.agents.form.per_million_cost', ['price' => number_format($overall, 3)]);
             } else {
-                $display = '  (' . __('app.teacher.agents.form.pricing_unknown') . ')';
+                $display = '  ('.__('app.teacher.agents.form.pricing_unknown').')';
             }
 
             return [
