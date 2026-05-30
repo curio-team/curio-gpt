@@ -48,16 +48,16 @@ class ModelPricingService
 
         $standardInput = max(0, $input - $cachedInput);
 
-        $inputStandardCost = ($standardInput / 1_000_000) * (float) $rates['input_per_million'];
+        $inputStandardCost = ((float) $standardInput / 1_000_000.0) * (float) $rates['input_per_million'];
         $inputCachedCost = 0.0;
         if (! empty($rates['cached_input_per_million']) && $cachedInput > 0) {
-            $inputCachedCost = ($cachedInput / 1_000_000) * (float) $rates['cached_input_per_million'];
+            $inputCachedCost = ((float) $cachedInput / 1_000_000.0) * (float) $rates['cached_input_per_million'];
         } elseif ($cachedInput > 0) {
             // fallback: if no cached price defined, bill cached as standard
-            $inputCachedCost = ($cachedInput / 1_000_000) * (float) $rates['input_per_million'];
+            $inputCachedCost = ((float) $cachedInput / 1_000_000.0) * (float) $rates['input_per_million'];
         }
 
-        $outputCost = ($output / 1_000_000) * (float) $rates['output_per_million'];
+        $outputCost = ((float) $output / 1_000_000.0) * (float) $rates['output_per_million'];
 
         $cost = $inputStandardCost + $inputCachedCost + $outputCost;
 

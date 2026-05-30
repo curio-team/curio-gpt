@@ -115,7 +115,7 @@ class CustomAgentController extends Controller
             $targetConversationId = $this->branchConversation(
                 $request->user(),
                 $validated['branchFrom']['conversationId'],
-                $validated['branchFrom']['keepMessageCount'],
+                (int) $validated['branchFrom']['keepMessageCount'],
                 $agentConfig->id,
             );
 
