@@ -17,7 +17,7 @@ class OpenAiModelService
         $url = rtrim(config('ai.providers.openai.url', 'https://api.openai.com/v1'), '/');
         $key = config('ai.providers.openai.key');
 
-        if (filled($key)) {
+        if (is_string($key) && $key !== '') {
             try {
                 $response = Http::baseUrl($url)
                     ->withToken($key)
