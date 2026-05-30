@@ -15,9 +15,10 @@ class OpenAiModelService
     public function listChatModels(): array
     {
         $url = rtrim(config('ai.providers.openai.url', 'https://api.openai.com/v1'), '/');
+        /** @var string|null $key */
         $key = config('ai.providers.openai.key');
 
-        if (is_string($key) && $key !== '') {
+        if (filled($key)) {
             try {
                 $response = Http::baseUrl($url)
                     ->withToken($key)
