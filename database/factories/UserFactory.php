@@ -27,7 +27,7 @@ class UserFactory extends Factory
             'id' => fake()->unique()->regexify('[A-Z]{2}[0-9]{2}'),
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'type' => fake()->randomElement(['teacher', 'student']),
+            'type' => fake()->randomElement(['admin', 'teacher', 'student']),
             'remember_token' => Str::random(10),
         ];
     }

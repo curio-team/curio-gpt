@@ -182,7 +182,7 @@ class TokenUsageService
             ->join('users as u', 'm.user_id', '=', 'u.id')
             ->whereNotNull('m.user_id')
             ->where('m.role', 'assistant')
-            ->where('u.type', '!=', 'teacher')
+            ->whereNotIn('u.type', ['teacher', 'admin']) // exclude teachers and admins
             ->whereBetween('m.created_at', [$start, $end])
             ->select(['m.usage', 'm.meta', 'm.agent'])
             ->orderBy('m.id')
