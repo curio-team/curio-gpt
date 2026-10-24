@@ -27,4 +27,16 @@ class SdApiService
 
         return $personalInfo;
     }
+
+    /**
+     * Returns the ids of the groups the signed in user belongs to.
+     *
+     * @return array<int, int|string>
+     */
+    public function getPersonalGroupIds(): array
+    {
+        $personalInfo = $this->getPersonalInfo();
+
+        return collect($personalInfo['groups'] ?? [])->pluck('id')->all();
+    }
 }

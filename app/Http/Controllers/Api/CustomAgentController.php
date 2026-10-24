@@ -6,6 +6,7 @@ use App\Ai\Agents\CustomAgent;
 use App\Http\Controllers\Controller;
 use App\Jobs\RunMonitoringAgent;
 use App\Models\AgentConfig;
+use App\Models\User;
 use App\Services\SdApiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,24 +33,11 @@ class CustomAgentController extends Controller
             return response()->json($agents);
         }
 
-        $personalInfo = $this->sdApiService->getPersonalInfo();
-        $userGroupIds = collect($personalInfo['groups'] ?? [])->pluck('id')->all();
+        $userGroupIds = $this->sdApiService->getPersonalGroupIds();
 
         $agents = AgentConfig::orderBy('name')
             ->get(['id', 'name', 'description', 'image_path', 'allowed_groups', 'is_enabled', 'available_from', 'available_until'])
-            ->filter(function (AgentConfig $agent) use ($userGroupIds) {
-                if (! $agent->isCurrentlyAvailable()) {
-                    return false;
-                }
-
-                $allowedGroups = $agent->allowed_groups;
-
-                if (empty($allowedGroups)) {
-                    return false;
-                }
-
-                return count(array_intersect($allowedGroups, $userGroupIds)) > 0;
-            })
+            ->filter(fn (AgentConfig $agent) => $agent->isCurrentlyAvailable() && $agent->isAllowedForGroups($userGroupIds))
             ->values()
             ->map(fn (AgentConfig $agent) => [
                 'id' => $agent->id,
@@ -80,12 +68,15 @@ class CustomAgentController extends Controller
                 abort(403);
             }
 
-            $personalInfo = $this->sdApiService->getPersonalInfo();
-            $userGroupIds = collect($personalInfo['groups'] ?? [])->pluck('id')->all();
-
-            if (empty($agentConfig->allowed_groups) || count(array_intersect($agentConfig->allowed_groups, $userGroupIds)) === 0) {
+            if (! $agentConfig->isAllowedForGroups($this->sdApiService->getPersonalGroupIds())) {
                 abort(403);
             }
+        }
+
+        $sourceConversationId = $validated['branchFrom']['conversationId'] ?? $validated['conversationId'] ?? null;
+
+        if ($sourceConversationId !== null) {
+            $this->ensureConversationIsAccessible($request->user(), $sourceConversationId, $agentConfig);
         }
 
         $agent = (new CustomAgent($agentConfig->instructions))
@@ -96,9 +87,10 @@ class CustomAgentController extends Controller
         if (isset($validated['branchFrom'])) {
             $existingUserTurns = DB::table('agent_conversation_messages')
                 ->where('conversation_id', $validated['branchFrom']['conversationId'])
-                ->where('role', 'user')
                 ->orderBy('id')
                 ->limit($validated['branchFrom']['keepMessageCount'])
+                ->pluck('role')
+                ->filter(fn (string $role) => $role === 'user')
                 ->count();
         } elseif ($validated['conversationId'] ?? null) {
             $existingUserTurns = DB::table('agent_conversation_messages')
@@ -125,19 +117,8 @@ class CustomAgentController extends Controller
         }
 
         $agentConfigId = $agentConfig->id;
+        $selectedModel = $agentConfig->resolveModel($validated['model'] ?? null);
 
-        // Determine model to use. If the teacher configured allowed models, enforce selection.
-        $selectedModel = $validated['model'] ?? null;
-        if (! empty($agentConfig->allowed_models)) {
-            if ($selectedModel && in_array($selectedModel, $agentConfig->allowed_models, true)) {
-                // ok
-            } else {
-                $selectedModel = $agentConfig->allowed_models[0] ?? 'gpt-4o';
-            }
-        } else {
-            // No restriction; use provided or fallback default
-            $selectedModel = $selectedModel ?: 'gpt-4o';
-        }
         $attachments = collect($agentConfig->attachments ?? [])
             ->pluck('provider_file_id')
             ->filter()
@@ -187,6 +168,30 @@ class CustomAgentController extends Controller
 
             yield "data: [DONE]\n\n";
         }, headers: ['Content-Type' => 'text/event-stream']);
+    }
+
+    /**
+     * Abort unless the user owns the conversation and it belongs to the given agent.
+     * Students additionally cannot continue conversations whose history was revoked.
+     */
+    private function ensureConversationIsAccessible(User $user, string $conversationId, AgentConfig $agentConfig): void
+    {
+        $conversationQuery = DB::table('agent_conversations')
+            ->where('id', $conversationId)
+            ->where('user_id', $user->id);
+
+        if (! $user->isTeacher()) {
+            $conversationQuery->whereNull('revoked_at');
+        }
+
+        $conversation = $conversationQuery->first();
+
+        abort_if(is_null($conversation), 404);
+
+        // The agent config is only linked once the first response completes, so an unlinked conversation is accepted.
+        if ($conversation->agent_config_id !== null && $conversation->agent_config_id !== $agentConfig->id) {
+            abort(403);
+        }
     }
 
     /**

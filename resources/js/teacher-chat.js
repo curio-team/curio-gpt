@@ -1,43 +1,5 @@
-import { marked } from 'marked';
-import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.min.css';
-
-// ─── Utilities & Templates ───────────────────────────────────────────────────
-function cloneTemplate(id) {
-    const tpl = document.getElementById(id);
-    if (!tpl || !tpl.content || !tpl.content.firstElementChild) {
-        throw new Error(`Missing template: ${id}`);
-    }
-    return tpl.content.firstElementChild.cloneNode(true);
-}
-
-const renderer = {
-    code({ text, lang }) {
-        const validLang = lang && hljs.getLanguage(lang) ? lang : 'plaintext';
-        const highlighted = hljs.highlight(text, { language: validLang }).value;
-
-        try {
-            const el = cloneTemplate('tpl-code-block');
-            const langEl = el.querySelector('[data-slot="lang"]');
-            const codeEl = el.querySelector('[data-slot="code"]');
-            const copyBtn = el.querySelector('.copy-code-btn');
-
-            if (langEl) { langEl.textContent = lang || 'text'; }
-            if (copyBtn) { copyBtn.dataset.code = encodeURIComponent(text); }
-            if (codeEl) {
-                codeEl.classList.add(`language-${validLang}`);
-                codeEl.innerHTML = highlighted;
-            }
-
-            return el.outerHTML;
-        } catch (e) {
-            // Fallback minimal HTML if template missing
-            return `<pre class="chat-code-pre"><code class="hljs language-${validLang}">${highlighted}</code></pre>`;
-        }
-    },
-};
-
-marked.use({ renderer, breaks: true, gfm: true });
+import { renderMarkdown } from './markdown';
 
 function getCheckIconHtml() {
     return document.getElementById('tpl-icon-check')?.innerHTML?.trim() ?? '✓';
@@ -62,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render any markdown blocks
     document.querySelectorAll('[data-md-source]').forEach((el) => {
         const rawText = el.textContent ?? '';
-        el.innerHTML = marked.parse(rawText);
+        el.innerHTML = renderMarkdown(rawText);
     });
 
     // Copy buttons for code blocks

@@ -31,4 +31,14 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
         ];
     }
+
+    public function student(): static
+    {
+        return $this->state(['type' => 'student']);
+    }
+
+    public function teacher(): static
+    {
+        return $this->state(['type' => 'teacher']);
+    }
 }

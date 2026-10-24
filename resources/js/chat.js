@@ -1,47 +1,5 @@
-import { marked } from 'marked';
-import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.min.css';
-
-// ─── Markdown Renderer ────────────────────────────────────────────────────────
-
-function cloneTemplate(id) {
-    const tpl = document.getElementById(id);
-    if (!tpl || !tpl.content || !tpl.content.firstElementChild) {
-        throw new Error(`Missing template: ${id}`);
-    }
-    return tpl.content.firstElementChild.cloneNode(true);
-}
-
-const renderer = {
-    html({ text }) {
-        return escapeHtml(text);
-    },
-    code({ text, lang }) {
-        const validLang = lang && hljs.getLanguage(lang) ? lang : 'plaintext';
-        const highlighted = hljs.highlight(text, { language: validLang }).value;
-
-        try {
-            const el = cloneTemplate('tpl-code-block');
-            const langEl = el.querySelector('[data-slot="lang"]');
-            const codeEl = el.querySelector('[data-slot="code"]');
-            const copyBtn = el.querySelector('.copy-code-btn');
-
-            if (langEl) { langEl.textContent = lang || 'text'; }
-            if (copyBtn) { copyBtn.dataset.code = encodeURIComponent(text); }
-            if (codeEl) {
-                codeEl.classList.add(`language-${validLang}`);
-                codeEl.innerHTML = highlighted;
-            }
-
-            return el.outerHTML;
-        } catch (e) {
-            // Fallback minimal HTML if template missing
-            return `<pre class="chat-code-pre"><code class="hljs language-${validLang}">${highlighted}</code></pre>`;
-        }
-    },
-};
-
-marked.use({ renderer, breaks: true, gfm: true });
+import { cloneTemplate, renderMarkdown } from './markdown';
 
 // ─── Icons & labels from templates ───────────────────────────────────────────
 function getCheckIconHtml() {
@@ -53,15 +11,6 @@ function getCopiedText() {
 }
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
-
-function escapeHtml(text) {
-    return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
 
 function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -400,7 +349,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                if (res.status === 429) {
+                // Rate limiting also answers 429, but (unlike the turn limit) includes Retry-After.
+                if (res.status === 429 && !res.headers.has('Retry-After')) {
                     lockChat();
                     return;
                 }
@@ -418,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function renderChunk() {
                 rafPending = false;
-                contentEl.innerHTML = marked.parse(rawText);
+                contentEl.innerHTML = renderMarkdown(rawText);
                 scrollBottom();
             }
 
@@ -467,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Final render, attach copy text, and track the message
-            contentEl.innerHTML = marked.parse(rawText);
+            contentEl.innerHTML = renderMarkdown(rawText);
             copyBtn.dataset.text = encodeURIComponent(rawText);
             chatMessages.push({ type: 'assistant', text: rawText, el: assistantEl });
             scrollBottom();
@@ -589,7 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     userTurnCount++;
                 } else if (msg.role === 'assistant') {
                     const { el: assistantEl, contentEl, copyBtn } = createAssistantBubble();
-                    contentEl.innerHTML = marked.parse(msg.content);
+                    contentEl.innerHTML = renderMarkdown(msg.content);
                     copyBtn.dataset.text = encodeURIComponent(msg.content);
                     chatMessages.push({ type: 'assistant', text: msg.content, el: assistantEl });
                 }

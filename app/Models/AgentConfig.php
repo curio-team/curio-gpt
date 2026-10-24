@@ -19,6 +19,11 @@ class AgentConfig extends Model
     use HasFactory;
 
     /**
+     * The model used when the teacher has not restricted the available models.
+     */
+    public const DEFAULT_MODEL = 'gpt-4o';
+
+    /**
      * The "type" of the primary key ID.
      *
      * @var string
@@ -112,6 +117,34 @@ class AgentConfig extends Model
         }
 
         return $now <= $this->available_until;
+    }
+
+    /**
+     * Returns whether a member of the given groups may use this agent.
+     *
+     * @param  array<int, int|string>  $groupIds
+     */
+    public function isAllowedForGroups(array $groupIds): bool
+    {
+        if (empty($this->allowed_groups)) {
+            return false;
+        }
+
+        return count(array_intersect($this->allowed_groups, $groupIds)) > 0;
+    }
+
+    /**
+     * Returns the requested model if the teacher allowed it, otherwise the default model.
+     */
+    public function resolveModel(?string $requestedModel): string
+    {
+        $allowedModels = $this->allowed_models ?? [];
+
+        if ($requestedModel !== null && in_array($requestedModel, $allowedModels, true)) {
+            return $requestedModel;
+        }
+
+        return $allowedModels[0] ?? self::DEFAULT_MODEL;
     }
 
     public function creator(): BelongsTo

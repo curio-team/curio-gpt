@@ -18,18 +18,11 @@ class ChatController extends Controller
         if ($user->isTeacher()) {
             $agents = AgentConfig::orderBy('name')->get(['id', 'name', 'description', 'image_path']);
         } else {
-            $personalInfo = $this->sdApiService->getPersonalInfo();
-            $userGroupIds = collect($personalInfo['groups'] ?? [])->pluck('id')->all();
+            $userGroupIds = $this->sdApiService->getPersonalGroupIds();
 
             $agents = AgentConfig::orderBy('name')
                 ->get(['id', 'name', 'description', 'image_path', 'allowed_groups'])
-                ->filter(function (AgentConfig $agent) use ($userGroupIds) {
-                    if (empty($agent->allowed_groups)) {
-                        return false;
-                    }
-
-                    return count(array_intersect($agent->allowed_groups, $userGroupIds)) > 0;
-                })
+                ->filter(fn (AgentConfig $agent) => $agent->isAllowedForGroups($userGroupIds))
                 ->values();
         }
 
@@ -41,10 +34,7 @@ class ChatController extends Controller
         $user = $request->user();
 
         if (! $user->isTeacher()) {
-            $personalInfo = $this->sdApiService->getPersonalInfo();
-            $userGroupIds = collect($personalInfo['groups'] ?? [])->pluck('id')->all();
-
-            if (empty($agentConfig->allowed_groups) || count(array_intersect($agentConfig->allowed_groups, $userGroupIds)) === 0) {
+            if (! $agentConfig->isAllowedForGroups($this->sdApiService->getPersonalGroupIds())) {
                 abort(403);
             }
         }

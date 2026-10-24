@@ -12,7 +12,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/agents', [CustomAgentController::class, 'agents']);
-    Route::post('/agent', [CustomAgentController::class, 'handle']);
+    Route::post('/agent', [CustomAgentController::class, 'handle'])->middleware('throttle:agent');
 
     Route::get('/conversations', [ConversationController::class, 'index']);
     Route::get('/conversations/{conversationId}/messages', [ConversationController::class, 'messages']);

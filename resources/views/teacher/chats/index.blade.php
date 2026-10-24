@@ -64,7 +64,7 @@
                                         $line = $line ?? ($lines[0] ?? '');
 
                                         $escaped = e($line);
-                                        $pattern = '/' . preg_quote($search, '/') . '/i';
+                                        $pattern = '/' . preg_quote(e($search), '/') . '/i';
                                             $highlightHtml = preg_replace(
                                                 $pattern,
                                                 '<mark class="bg-yellow-200 dark:bg-yellow-600/40 px-0.5 rounded">$0</mark>',
@@ -72,7 +72,7 @@
                                             );
                                     } else {
                                         $titleEscaped = e($conversation->title ?? '');
-                                        $pattern = '/' . preg_quote($search, '/') . '/i';
+                                        $pattern = '/' . preg_quote(e($search), '/') . '/i';
                                             $highlightHtml = preg_replace(
                                                 $pattern,
                                                 '<mark class="bg-yellow-200 dark:bg-yellow-600/40 px-0.5 rounded">$0</mark>',

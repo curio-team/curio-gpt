@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AgentConfig;
+use App\Services\SdApiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ConversationController extends Controller
 {
+    public function __construct(private readonly SdApiService $sdApiService) {}
+
     public function index(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -17,15 +20,7 @@ class ConversationController extends Controller
         ]);
 
         if (! $request->user()->isTeacher()) {
-            $agentConfig = AgentConfig::findOrFail($validated['agentConfigId']);
-
-            if (! $agentConfig->isCurrentlyAvailable()) {
-                abort(403);
-            }
-
-            if ($agentConfig->history_is_disabled) {
-                abort(403);
-            }
+            $this->ensureStudentCanViewHistory(AgentConfig::findOrFail($validated['agentConfigId']));
         }
 
         $query = DB::table('agent_conversations')
@@ -61,9 +56,9 @@ class ConversationController extends Controller
         if (! $request->user()->isTeacher() && $conversation->agent_config_id !== null) {
             $agentConfig = AgentConfig::find($conversation->agent_config_id);
 
-            if ($agentConfig === null || ! $agentConfig->isCurrentlyAvailable()) {
-                abort(403);
-            }
+            abort_if($agentConfig === null, 403);
+
+            $this->ensureStudentCanViewHistory($agentConfig);
         }
 
         $messages = DB::table('agent_conversation_messages')
@@ -72,5 +67,19 @@ class ConversationController extends Controller
             ->get(['role', 'content']);
 
         return response()->json($messages);
+    }
+
+    /**
+     * Abort unless the agent is available to the student and keeps history.
+     */
+    private function ensureStudentCanViewHistory(AgentConfig $agentConfig): void
+    {
+        if (! $agentConfig->isCurrentlyAvailable() || $agentConfig->history_is_disabled) {
+            abort(403);
+        }
+
+        if (! $agentConfig->isAllowedForGroups($this->sdApiService->getPersonalGroupIds())) {
+            abort(403);
+        }
     }
 }
